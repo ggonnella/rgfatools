@@ -27,7 +27,9 @@ Gem::Specification.new do |s|
   s.author = 'Giorgio Gonnella'
   s.email = 'gonnella@zbh.uni-hamburg.de'
   s.files = [
-              'lib/gfa/edit.rb',
+              'lib/gfatools.rb',
+              'lib/gfatools/edit.rb',
+              'lib/gfatools/traverse.rb',
             ]
   s.homepage = 'http://github.com/ggonnella/ruby-gfa'
   s.license = 'CC-BY-SA'
