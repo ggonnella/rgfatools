@@ -9,10 +9,10 @@ task :default => :test
 
 desc "Build gem"
 task :build do
-  system("gem build gfa.gemspec")
+  system("gem build gfatools.gemspec")
 end
 
 desc "Install gem"
 task :install => :build do
-  system("gem install gfa")
+  system("gem install gfatools")
 end
