@@ -1,5 +1,35 @@
 module GFATools::Edit
 
+  def self.included(mod)
+    extended_methods = [:multiply_segment, :duplicate_segment]
+    GFATools.redefine_methods(extended_methods, mod)
+  end
+
+  def multiply_segment_with_gfatools(segment_name, factor,
+                       copy_names: :lowcase,
+                       links_distribution_policy: :auto,
+                       origin_tag: :or)
+    s = segment(segment_name)
+    s.send(:"#{origin_tag}=", s.name) if !s.send(origin_tag)
+    copy_names = compute_copy_names(copy_names, segment_name, factor)
+    multiply_segment_without_gfatools(segment_name, factor,
+                                      copy_names: copy_names)
+    distribute_links(links_distribution_policy, segment_name, copy_names,
+                     factor)
+    return self
+  end
+
+  def duplicate_segment_with_gfatools(segment_name, copy_name: :lowcase,
+                       links_distribution_policy: :auto,
+                       origin_tag: :or)
+    multiply_segment_with_gfatools(segment_name, 2,
+                     copy_names:
+                       copy_name.kind_of?(String) ? [copy_name] : copy_name,
+                     links_distribution_policy: links_distribution_policy,
+                     origin_tag: origin_tag)
+  end
+
+
   def delete_low_coverage_segments(mincov, count_tag: :RC)
     segments.map do |s|
       cov = s.coverage(count_tag: count_tag)
@@ -190,6 +220,58 @@ module GFATools::Edit
     n[pairs] = "(" + n[pairs]
     n[-1-pairs] = n[-1-pairs] + ")"
     rename_segment(segment.name, n.join("_"))
+  end
+
+  def select_distribute_end(links_distribution_policy, segment_name, factor)
+    accepted = [:off, :auto, :equal, :E, :B]
+    if !accepted.include?(links_distribution_policy)
+      raise "Unknown links_distribution_policy, accepted values are: "+
+        accepted.inspect
+    end
+    return nil if links_distribution_policy == :off
+    if [:B, :E].include?(links_distribution_policy)
+      return links_distribution_policy
+    end
+    esize = links_of([segment_name, :E]).size
+    bsize = links_of([segment_name, :B]).size
+    if esize == factor
+      return :E
+    elsif bsize == factor
+      return :B
+    elsif links_distribution_policy == :equal
+      return nil
+    elsif esize < 2
+      return (bsize < 2) ? nil : :B
+    elsif bsize < 2
+      return :E
+    elsif esize < factor
+      return ((bsize <= esize) ? :E :
+        ((bsize < factor) ? :B : :E))
+    elsif bsize < factor
+      return :B
+    else
+      return ((bsize <= esize) ? :B : :E)
+    end
+  end
+
+  def distribute_links(links_distribution_policy, segment_name,
+                       copy_names, factor)
+    return if factor < 2
+    end_type = select_distribute_end(links_distribution_policy,
+                                     segment_name, factor)
+    return nil if end_type.nil?
+    et_links = links_of([segment_name, end_type])
+    diff = [et_links.size - factor, 0].max
+    links_signatures = et_links.map do |l|
+      l.other_end([segment_name, end_type]).join
+    end
+    ([segment_name]+copy_names).each_with_index do |sn, i|
+      links_of([sn, end_type]).each do |l|
+        l_sig = l.other_end([sn, end_type]).join
+        to_save = links_signatures[i..i+diff].to_a
+        delete_link_line(l) unless to_save.include?(l_sig)
+      end
+    end
   end
 
 end
