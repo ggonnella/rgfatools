@@ -98,7 +98,7 @@ module GFATools::Edit
     self
   end
 
-  def enforce_segment_single_edges(segment_name)
+  def enforce_segment_mandatory_links(segment_name)
     s = segment!(segment_name)
     se = {}
     l = {}
@@ -122,8 +122,8 @@ module GFATools::Edit
     self
   end
 
-  def enforce_all_single_edges
-    segment_names.each {|sn| enforce_segment_single_edges(sn)}
+  def enforce_all_mandatory_links
+    segment_names.each {|sn| enforce_segment_mandatory_links(sn)}
     self
   end
 
