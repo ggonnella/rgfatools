@@ -127,6 +127,16 @@ module GFATools::Edit
     self
   end
 
+  def remove_self_link(segment_name)
+    unconnect_segments(segment_name, segment_name)
+    self
+  end
+
+  def remove_self_links
+    segment_names.each {|sn| remove_self_link(sn)}
+    self
+  end
+
   private
 
   def randomly_orient_proven_invertible_segment(segment_name)
