@@ -1,28 +1,28 @@
 module GFATools::Edit
 
   def self.included(mod)
-    extended_methods = [:multiply_segment, :duplicate_segment]
+    extended_methods = [:multiply, :duplicate]
     GFATools.redefine_methods(extended_methods, mod)
   end
 
-  def multiply_segment_with_gfatools(segment_name, factor,
+  def multiply_with_gfatools(segment_name, factor,
                        copy_names: :lowcase,
                        links_distribution_policy: :auto,
                        origin_tag: :or)
     s = segment(segment_name)
     s.send(:"#{origin_tag}=", s.name) if !s.send(origin_tag)
     copy_names = compute_copy_names(copy_names, segment_name, factor)
-    multiply_segment_without_gfatools(segment_name, factor,
+    multiply_without_gfatools(segment_name, factor,
                                       copy_names: copy_names)
     distribute_links(links_distribution_policy, segment_name, copy_names,
                      factor)
     return self
   end
 
-  def duplicate_segment_with_gfatools(segment_name, copy_name: :lowcase,
+  def duplicate_with_gfatools(segment_name, copy_name: :lowcase,
                        links_distribution_policy: :auto,
                        origin_tag: :or)
-    multiply_segment_with_gfatools(segment_name, 2,
+    multiply_with_gfatools(segment_name, 2,
                      copy_names:
                        copy_name.kind_of?(String) ? [copy_name] : copy_name,
                      links_distribution_policy: links_distribution_policy,
@@ -62,20 +62,20 @@ module GFATools::Edit
                         copy_names_suffix: :lowcase, origin_tag: :or)
     s = segment!(segment_name)
     factor = s.send(:"#{tag}!")
-    multiply_segment(segment_name, factor,
-                     links_distribution_policy: links_distribution_policy,
-                     copy_names: copy_names_suffix,
-                     origin_tag: origin_tag)
+    multiply(segment_name, factor,
+             links_distribution_policy: links_distribution_policy,
+             copy_names: copy_names_suffix,
+             origin_tag: origin_tag)
     self
   end
 
   def apply_copy_numbers(tag: :cn, links_distribution_policy: :auto,
                          copy_names_suffix: :lowcase, origin_tag: :or)
     segments.sort_by{|s|s.send(:"#{tag}!")}.each do |s|
-      multiply_segment(s.name, s.send(tag),
-                       links_distribution_policy: links_distribution_policy,
-                       copy_names: copy_names_suffix,
-                       origin_tag: origin_tag)
+      multiply(s.name, s.send(tag),
+               links_distribution_policy: links_distribution_policy,
+               copy_names: copy_names_suffix,
+               origin_tag: origin_tag)
     end
     self
   end
