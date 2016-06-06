@@ -80,7 +80,7 @@ module GFATools::Edit
     self
   end
 
-  def randomly_orient_invertible_segments
+  def randomly_orient_invertibles
     segment_names.each do |sn|
       if segment_same_links_both_ends?(sn)
         randomly_orient_proven_invertible_segment(sn)
@@ -89,7 +89,7 @@ module GFATools::Edit
     self
   end
 
-  def randomly_orient_invertible_segment(segment_name)
+  def randomly_orient_invertible(segment_name)
     if !segment_same_links_both_ends?(sn)
       raise "Only segments with links to the same or equivalent segments "+
               "at both ends can be randomly oriented"
