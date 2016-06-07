@@ -44,6 +44,13 @@ module GFATools::Edit
   def remove_small_components(minlen)
      gfa.rm(gfa.connected_components.select {|cc|
         cc.map{|sn|gfa.segment!(sn).length}.reduce(:+) < minlen })
+     self
+  end
+
+  def remove_dead_ends(minlen)
+    gfa.rm(gfa.segments.select {|s|
+      c = s.connectivity; s.length < minlen and c[0] == 0 or c[1] == 0 })
+    self
   end
 
   def compute_copy_numbers(single_copy_coverage,
