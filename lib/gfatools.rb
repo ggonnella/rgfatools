@@ -5,6 +5,8 @@ require_relative "./gfatools/traverse.rb"
 
 module GFATools
 
+  ProgramName = "RGFATools"
+
   def gfatools_included?
     true
   end
@@ -23,12 +25,16 @@ module GFATools
     end
   end
 
+  private
+
+  def add_program_name_to_header
+    set_header_field(:pn, GFATools::ProgramName)
+  end
+
 end
 
 class GFA
 
   include GFATools
-  include GFATools::Edit
-  include GFATools::Traverse
 
 end
