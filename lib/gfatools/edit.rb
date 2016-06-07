@@ -41,6 +41,11 @@ module GFATools::Edit
     self
   end
 
+  def remove_small_components(minlen)
+     gfa.rm(gfa.connected_components.select {|cc|
+        cc.map{|sn|gfa.segment!(sn).length}.reduce(:+) < minlen })
+  end
+
   def compute_copy_numbers(single_copy_coverage,
                            mincov: single_copy_coverage * 0.25,
                            count_tag: :RC, tag: :cn)
