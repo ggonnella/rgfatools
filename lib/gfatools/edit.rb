@@ -229,7 +229,7 @@ module GFATools::Edit
     segment.rn = rn
     n[pairs] = "(" + n[pairs]
     n[-1-pairs] = n[-1-pairs] + ")"
-    rename_segment(segment.name, n.join("_"))
+    rename(segment.name, n.join("_"))
   end
 
   def select_distribute_end(links_distribution_policy, segment_name, factor)
