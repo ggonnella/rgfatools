@@ -42,14 +42,16 @@ module GFATools::Edit
   end
 
   def remove_small_components(minlen)
-     gfa.rm(gfa.connected_components.select {|cc|
-        cc.map{|sn|gfa.segment!(sn).length}.reduce(:+) < minlen })
-     self
+    rm(connected_components.select {|cc|
+      cc.map{|sn|segment!(sn).length}.reduce(:+) < minlen })
+    self
   end
 
   def remove_dead_ends(minlen)
-    gfa.rm(gfa.segments.select {|s|
-      c = s.connectivity; s.length < minlen and c[0] == 0 or c[1] == 0 })
+    rm(segments.select {|s|
+      c = connectivity(s); s.length < minlen and
+        c[0] == 0 or c[1] == 0 and
+        !cut_segment?(s) })
     self
   end
 
