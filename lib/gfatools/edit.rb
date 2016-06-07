@@ -103,7 +103,7 @@ module GFATools::Edit
     self
   end
 
-  def enforce_segment_mandatory_links(segment_name)
+  def enforce_segment_mandatory_links(segment_name, conserve_components: true)
     s = segment!(segment_name)
     se = {}
     l = {}
@@ -116,19 +116,21 @@ module GFATools::Edit
       oe = {}
       [:B, :E].each {|et| oe[et] = l[et][0].other_end(se[et])}
       return if oe[:B] == oe[:E]
-      [:B, :E].each {|et| delete_other_links(oe[et], se[et])}
+      [:B, :E].each {|et| delete_other_links(oe[et], se[et],
+                                    conserve_components: conserve_components)}
     else
       i = cs.index(1)
       return if i.nil?
       et = [:B, :E][i]
       oe = l[et][0].other_end(se[et])
-      delete_other_links(oe, se[et])
+      delete_other_links(oe, se[et], conserve_components: conserve_components)
     end
     self
   end
 
-  def enforce_all_mandatory_links
-    segment_names.each {|sn| enforce_segment_mandatory_links(sn)}
+  def enforce_all_mandatory_links(conserve_components: true)
+    segment_names.each {|sn| enforce_segment_mandatory_links(sn,
+                               conserve_components: conserve_components)}
     self
   end
 
