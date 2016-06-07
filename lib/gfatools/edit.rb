@@ -1,9 +1,6 @@
 module GFATools::Edit
 
-  def self.included(mod)
-    extended_methods = [:multiply, :duplicate]
-    GFATools.redefine_methods(extended_methods, mod)
-  end
+  Redefined = [:multiply, :duplicate]
 
   def multiply_with_gfatools(segment_name, factor,
                        copy_names: :lowcase,

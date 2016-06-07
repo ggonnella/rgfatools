@@ -4,12 +4,9 @@
 #
 module GFATools::Traverse
 
-  require "set"
+  Redefined = [:add_segment_to_merged]
 
-  def self.included(mod)
-    extended_methods = [:add_segment_to_merged]
-    GFATools.redefine_methods(extended_methods, mod)
-  end
+  require "set"
 
   def remove_p_bubbles
     visited = Set.new

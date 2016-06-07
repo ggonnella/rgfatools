@@ -1,14 +1,22 @@
 GFATools = Module.new
+
 require "gfa"
 require_relative "./gfatools/edit.rb"
 require_relative "./gfatools/traverse.rb"
 
 module GFATools
 
+  include GFATools::Edit
+  include GFATools::Traverse
+
   ProgramName = "RGFATools"
 
-  def gfatools_included?
-    true
+  private
+
+  def self.included(mod)
+    included_modules.each do |im|
+      self.redefine_methods(eval("#{im}::Redefined"), mod)
+    end
   end
 
   def self.redefine_methods(extended_methods, mod)
@@ -25,16 +33,10 @@ module GFATools
     end
   end
 
-  private
-
   def add_program_name_to_header
     set_header_field(:pn, GFATools::ProgramName)
   end
 
 end
 
-class GFA
-
-  include GFATools
-
-end
+class GFA; include GFATools; end
