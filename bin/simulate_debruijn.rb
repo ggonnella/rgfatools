@@ -69,6 +69,7 @@ end
 logger.progress_end(:generate_graph)
 segmentscount = i-1
 linkscount = links.size
+puts "H\tks:i:#{k}"
 logger.progress_init(:write_segments, "segments", segmentscount,
                      "Output #{segmentscount} segments")
 segments.each do |km1mer, data|
