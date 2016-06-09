@@ -30,10 +30,20 @@ module GFATools::Edit
                      origin_tag: origin_tag)
   end
 
+  def set_default_count_tag(tag)
+    @default[:count_tag] = tag
+  end
 
-  def delete_low_coverage_segments(mincov, count_tag: :RC)
+  def set_count_unit_length(n)
+    @default[:unit_length] = n
+  end
+
+  def delete_low_coverage_segments(mincov,
+                                   count_tag: @default[:count_tag],
+                                   unit_length: @default[:unit_length])
     segments.map do |s|
-      cov = s.coverage(count_tag: count_tag)
+      cov = s.coverage(count_tag: count_tag,
+                       unit_length: unit_length)
       cov < mincov ? s.name : nil
     end.compact.each do |sn|
       delete_segment(sn)
@@ -57,9 +67,10 @@ module GFATools::Edit
 
   def compute_copy_numbers(single_copy_coverage,
                            mincov: single_copy_coverage * 0.25,
-                           count_tag: :RC, tag: :cn)
+                           count_tag: @default[:count_tag], tag: :cn,
+                           unit_length: @default[:unit_length])
     segments.each do |s|
-      cov = s.coverage!(count_tag: count_tag).to_f
+      cov = s.coverage!(count_tag: count_tag, unit_length: unit_length).to_f
       if cov < mincov
         cn = 0
       elsif cov < single_copy_coverage
@@ -202,7 +213,7 @@ module GFATools::Edit
     s = segment!(segment_end[0])
     link_targets_for_cmp(segment_end).join(",")+"\t"+
     link_targets_for_cmp(other_segment_end(segment_end)).join(",")+"\t"+
-    [:or, :coverage].map do |field|
+    [:or].map do |field|
       s.send(field)
     end.join("\t")
   end
@@ -210,7 +221,7 @@ module GFATools::Edit
   def segments_equivalent?(segment_names)
     raise if segment_names.size < 2
     segments = segment_names.map{|sn|segment!(sn)}
-    [:or, :coverage].each do |field|
+    [:or].each do |field|
       if segments.any?{|s|s.send(field) != segments.first.send(field)}
         return false
       end

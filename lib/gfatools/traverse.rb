@@ -25,18 +25,25 @@ module GFATools::Traverse
     end
   end
 
-  def remove_p_bubble(segment_end1, segment_end2)
+  def remove_p_bubble(segment_end1, segment_end2,
+                      count_tag: @default[:count_tag],
+                      unit_length: @default[:unit_length])
     n1 = neighbours(segment_end1).sort
     n2 = neighbours(segment_end2).sort
     raise if n1 != n2.map{|se| other_segment_end(se)}
     raise if n1.any? {|se| connectivity(se[0]) != [1,1]}
-    remove_proven_p_bubble(segment_end1, segment_end2, n1)
+    remove_proven_p_bubble(segment_end1, segment_end2, n1,
+                           count_tag: count_tag,
+                           unit_length: unit_length)
   end
 
   private
 
-  def remove_proven_p_bubble(segment_end1, segment_end2, alternatives)
-    coverages = alternatives.map{|s|segment!(s[0]).coverage}
+  def remove_proven_p_bubble(segment_end1, segment_end2, alternatives,
+                             count_tag: @default[:count_tag],
+                             unit_length: @default[:unit_length])
+    coverages = alternatives.map{|s|segment!(s[0]).coverage(
+      count_tag: count_tag, unit_length: unit_length)}
     alternatives.delete_at(coverages.index(coverages.max))
     alternatives.each {|s| delete_segment(s[0])}
   end
