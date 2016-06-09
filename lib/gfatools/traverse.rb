@@ -59,7 +59,12 @@ module GFATools::Traverse
     pos_array.map {|pos| lastpos - pos + 1}.reverse
   end
 
-  def add_segment_to_merged_with_gfatools(merged, segment, reversed, cut, init)
+  def add_segment_to_merged_with_gfatools(merged, segment, reversed, cut, init,
+                                          options)
+    if options[:disable_tracking]
+      return add_segment_to_merged_without_gfatools(merged, segment, reversed,
+                                                    cut, init, options)
+    end
     s = (reversed ? segment.sequence.rc[cut..-1] : segment.sequence[cut..-1])
     n = (reversed ? reverse_segment_name(segment.name, "_") : segment.name)
     rn = (reversed ? reverse_pos_array(segment.rn, segment.LN) : segment.rn)
@@ -72,7 +77,7 @@ module GFATools::Traverse
     end
     if init
       merged.sequence = s
-      merged.name = n
+      merged.name = options[:merged_name].nil? ? n : options[:merged_name]
       merged.LN = segment.LN
       merged.rn = rn
       merged.or = o
@@ -80,7 +85,7 @@ module GFATools::Traverse
     else
       (segment.sequence == "*") ? (merged.sequence = "*")
                                 : (merged.sequence += s)
-      merged.name += "_#{n}"
+      merged.name += "_#{n}" if options[:merged_name].nil?
       if merged.LN
         if rn
           rn = rn.map {|pos| pos - cut + merged.LN}
