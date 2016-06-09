@@ -30,7 +30,9 @@ Gem::Specification.new do |s|
               'lib/gfatools.rb',
               'lib/gfatools/edit.rb',
               'lib/gfatools/traverse.rb',
-              'bin/gfatools/gfadiff.rb'
+              'bin/gfatools/gfadiff.rb',
+              'bin/gfatools/simplify.rb',
+              'bin/gfatools/simulate_debrujin.rb',
             ]
   s.homepage = 'http://github.com/ggonnella/ruby-gfa'
   s.license = 'CC-BY-SA'
