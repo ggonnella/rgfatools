@@ -17,24 +17,45 @@ class GFA
                         count_tag: @default[:count_tag])/2).round
     end
     output_segment_infos if $debugmode
+    maxvisits_global = {:B => {}, :E => {}}
     segment_names.each do |sn|
       s = segment(sn)
       next if s.length < minlen or s.length > maxlen
       next if s.cn < minrepeats
       circles = {}
       linear = {}
+      maxvisits = {}
       [:B, :E].each do |rt|
-        maxvisits = {}
-        maxvisits[sn.to_sym] ||= s.cn
+        maxvisits[rt] = maxvisits_global[rt].dup
+        maxvisits[rt][sn.to_sym] ||= s.cn
         circles[rt] = []
         linear[rt] = []
         links_of([sn, rt]).each do |l|
-          loop do
-            mv = maxvisits[sn.to_sym]
-            search_circle(other_segment_end([sn,rt]),[sn,rt],l,maxvisits,0,
-                          maxlen*2+s.length,[[sn,rt]],circles[rt],linear[rt])
-            break if maxvisits[sn.to_sym] < 1 or maxvisits[sn.to_sym] == mv
+          search_circle(other_segment_end([sn,rt]),[sn,rt],l,maxvisits[rt],0,
+                        maxlen*2+s.length,[[sn,rt]],circles[rt],linear[rt])
+        end
+        if maxvisits[rt][sn.to_sym] > 0
+          multi = {:l => [], :c => []}
+          [[linear[rt],:l], [circles[rt],:c]].each do |paths, pt|
+            paths.each do |c|
+              min_mv = s.cn
+              upto = (pt == :l ? -1 : -2)
+              c[0..upto].each do |csn, et|
+                mv = maxvisits[rt][csn.to_sym]
+                if mv < min_mv
+                  min_mv = mv
+                end
+              end
+              if min_mv > 0
+                min_mv.times { multi[pt] << c.dup }
+                c[0..upto].each do |csn, et|
+                  maxvisits[rt][csn.to_sym] -= min_mv
+                end
+              end
+            end
           end
+          circles[rt] += multi[:c]
+          linear[rt] += multi[:l]
         end
       end
       n_paths = (circles[:E].size+circles[:B].size+
@@ -53,6 +74,7 @@ class GFA
       before = merge_crisprs_path(linear[:B][0],s,:B)
       after = merge_crisprs_path(linear[:E][0],s,:E)
       next if merged_circles.size < minrepeats
+      maxvisits_global = maxvisits
       instances = 1
       possible_instances = 0
       merged_circles.each do |seq|
