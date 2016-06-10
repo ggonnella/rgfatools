@@ -2,14 +2,14 @@
 
 require "gfatools"
 
-# crisps have a structure ARU1RU..RUnRB where |U|~|R| in [24..50]
+# crisprs have a structure ARU1RU..RUnRB where |U|~|R| in [24..50]
 
 $debugmode = false
 $spacersonly = false
 
 class GFA
 
-  def find_crisps(minrepeats=3,minlen=24,maxlen=50)
+  def find_crisprs(minrepeats=3,minlen=24,maxlen=50)
     ls = {}
     segment_names.each do |sn|
       s = segment(sn)
@@ -78,9 +78,9 @@ class GFA
       all_circles = circles[:E]
       #all_circles += circles[:B].map{|c|reverse_segpath(c)}
       #all_circles.uniq!
-      all_circles.each {|c|merged_circles << merge_crisps_path(c,s,:E)}
-      before = merge_crisps_path(linear[:B][0],s,:B)
-      after = merge_crisps_path(linear[:E][0],s,:E)
+      all_circles.each {|c|merged_circles << merge_crisprs_path(c,s,:E)}
+      before = merge_crisprs_path(linear[:B][0],s,:B)
+      after = merge_crisprs_path(linear[:E][0],s,:E)
       next if merged_circles.size < minrepeats
       instances = 1
       possible_instances = 0
@@ -130,7 +130,7 @@ class GFA
 
   private
 
-  def merge_crisps_path(segpath,repeat,repeat_end)
+  def merge_crisprs_path(segpath,repeat,repeat_end)
     merged = create_merged_segment(segpath, merged_name: :short,
                                  disable_tracking: true)[0]
     sequence = merged.sequence[repeat.
@@ -210,5 +210,5 @@ end
 gfa = GFA.from_file(ARGV[0])
 gfa.set_default_count_tag(:KC)
 gfa.set_count_unit_length(gfa.headers_data[:ks]-1)
-gfa.find_crisps
+gfa.find_crisprs
 
