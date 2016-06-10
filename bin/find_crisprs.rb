@@ -32,6 +32,7 @@ class GFA
         linear[rt] = []
         links_of([sn, rt]).each do |l|
           search_circle(other_segment_end([sn,rt]),[sn,rt],l,maxvisits[rt],0,
+                        minlen,
                         maxlen*2+s.length,[[sn,rt]],circles[rt],linear[rt])
         end
         if maxvisits[rt][sn.to_sym] > 0
@@ -144,13 +145,16 @@ class GFA
     return sequence
   end
 
-  def search_circle(goal,from,l,maxvisits,dist,maxdist,path,circles,linear)
+  def search_circle(goal,from,l,maxvisits,dist,mindist,maxdist,path,circles,linear)
     dest_end = l.other_end(from)
     dest = segment(dest_end[0])
     destsym = dest.name.to_sym
     maxvisits[destsym] ||= dest.cn
     se = other_segment_end(dest_end)
     if dest_end == goal
+      if dist < mindist
+        return
+      end
       new_path = path.dup
       new_path << se
       new_path[0..-2].each {|x| maxvisits[x[0].to_sym] -= 1}
@@ -183,7 +187,7 @@ class GFA
       next_dest = segment(next_l.other_end(se)[0])
       maxvisits[next_dest.name.to_sym] ||= next_dest.cn
       next if maxvisits[next_dest.name.to_sym] == 0
-      search_circle(goal,se,next_l,maxvisits,dist,maxdist,new_path,
+      search_circle(goal,se,next_l,maxvisits,dist,mindist,maxdist,new_path,
                     circles,linear)
     end
     return
