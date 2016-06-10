@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
-require "gfa"
+require "gfatools"
 
 # crisps have a structure ARU1RU..RUnRB where |U|~|R| in [24..50]
 
-$debugmode = false
+$debugmode = true
 
 class GFA
 
@@ -12,8 +12,8 @@ class GFA
     ls = {}
     segment_names.each do |sn|
       s = segment(sn)
-      s.cn = s.coverage(unit_length: @default[:unit_length],
-                        count_tag: @default[:count_tag])
+      s.cn = (s.coverage(unit_length: @default[:unit_length],
+                        count_tag: @default[:count_tag])/2).round
     end
     if $debugmode
       segment_names.each do |sn|
@@ -59,9 +59,8 @@ class GFA
       merged_circles.each do |seq|
         if seq.length > s.length + minlen
           possible_instances += 1
-        else
-          instances += 1
         end
+        instances += 1
       end
       puts "CRISP signature found in segment #{s.name}"
       puts
@@ -80,10 +79,13 @@ class GFA
         if seq.length > s.length + minlen
           str = "=#{s.length}+2*#{(seq.length.to_f - s.length)/2}"
           asterisk = true
+          this_asterisk = true
         else
           str = ""
+          this_asterisk = false
         end
-        puts "    (#{i+1})\tlength = #{seq.length}#{str};\tsequence = #{seq}"
+        puts "    (#{i+1}#{this_asterisk ? "*" : ""})\t"+
+          "length = #{seq.length}#{str};\tsequence = #{seq}"
       end
       if asterisk
         puts
@@ -144,6 +146,6 @@ if (ARGV.size == 0)
 end
 gfa = GFA.from_file(ARGV[0])
 gfa.set_default_count_tag(:KC)
-gfa.set_count_unit_length(gfa.headers_data[:ks])
+gfa.set_count_unit_length(gfa.headers_data[:ks]-1)
 gfa.find_crisps
 

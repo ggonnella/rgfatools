@@ -7,7 +7,7 @@ if ARGV.size != 1
 end
 
 gfa = GFA.new
-gfa.enable_progress_logging(part: 0.01)
+gfa.enable_progress_logging(part: 0.1)
 gfa.turn_off_validations
 gfa.read_file(ARGV[0])
 gfa.merge_linear_paths(disable_tracking: true, merged_name: :short)
