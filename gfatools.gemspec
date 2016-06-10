@@ -32,7 +32,7 @@ Gem::Specification.new do |s|
               'lib/gfatools/traverse.rb',
               'bin/gfadiff.rb',
               'bin/simplify.rb',
-              'bin/simulate_debrujin.rb',
+              'bin/simulate_debruijn.rb',
               'bin/find_crisps.rb',
             ]
   s.homepage = 'http://github.com/ggonnella/ruby-gfa'
