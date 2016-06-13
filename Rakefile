@@ -16,3 +16,8 @@ desc "Install gem"
 task :install => :build do
   system("gem install gfatools")
 end
+
+desc "Rm files created by rake build"
+task :clean do
+  system("rm -f gfatools-*.gem")
+end
