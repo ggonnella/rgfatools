@@ -1,0 +1,55 @@
+<p>
+<b>RGFA</b> is a Ruby gem, which provides an implementation of the
+“Graphical Fragment Assembly” (GFA) format specification in Ruby.
+It allows to conveniently parse, edit and write GFA files. Complex operations such as the separation of the
+implicit instances of repeats and the merging of linear paths can be performed.
+A typical application of RGFA is the editing of a graph, to finish the assembly of a sequence, using
+information not available to the assembler.
+</p>
+
+<p>
+<b>RGFATools</b> is a gem, dependent on the RGFA gem.
+It extends the RGFA library, implementing graph operations, for which
+custom tags are used (or, mp, rn) and assumptions are made,
+ such as the presence of count information on segments
+(RC/KC/FC tags). It also provides RGFA-based scripts, such as find_crisprs.rb,
+ which allows to detect CRISPRs in a de Bruijn graph.
+</p>
+
+<p>
+The <b>GFAdiff</b> program, which compares the information in two graphs, and
+generate a report or a Ruby script documenting the transformation steps
+between the graphs, is part of the RGFATools gem.
+</p>
+
+<h2>Installation</h2>
+
+<p>Make sure you have Ruby version &geq; 2.0 installed on your system
+and Rubygems is available. E.g. under Linux/Mac open a terminal and
+type <tt>ruby -v</tt> and <tt>gem -v</tt>.
+Download the RGFA and RGFATools gems from the links provided below. Install
+the gems using the commands <tt>gem install gfa gfatools</tt>, in the
+directory where you downloaded the files.
+
+<h2>Download</h2>
+
+<ul>
+  <li>RGFA 1.0: gfa-1.0.gem</li>
+  <li>RGFATools/GFAdiff 1.0: gfatools-1.0.gem</li>
+</ul>
+
+<h2>Changelog</h2>
+
+<h3>RGFA</h3>
+<p>ver. 1.0</p>
+<ul>
+  <li>Initial release</li>
+</ul>
+
+<h3>RGFATools/GFAdiff</h3>
+<p>ver. 1.0</p>
+<ul>
+  <li>Initial release</li>
+</ul>
+
+
