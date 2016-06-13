@@ -35,7 +35,7 @@ Gem::Specification.new do |s|
               'bin/gfadiff.rb',
               'bin/simplify.rb',
               'bin/simulate_debruijn.rb',
-              'bin/find_crisps.rb',
+              'bin/find_crisprs.rb',
             ]
   s.homepage = 'http://github.com/ggonnella/ruby-gfa'
   s.license = 'CC-BY-SA'
