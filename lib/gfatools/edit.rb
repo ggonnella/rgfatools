@@ -1,6 +1,6 @@
 module GFATools::Edit
 
-  Redefined = [:multiply, :duplicate]
+  Redefined = [:multiply]
 
   def multiply_with_gfatools(segment_name, factor,
                        copy_names: :lowcase,
@@ -16,18 +16,6 @@ module GFATools::Edit
     distribute_links(links_distribution_policy, segment_name, copy_names,
                      factor)
     return self
-  end
-
-  def duplicate_with_gfatools(segment_name, copy_name: :lowcase,
-                       links_distribution_policy: :auto,
-                       conserve_components: true,
-                       origin_tag: :or)
-    multiply_with_gfatools(segment_name, 2,
-                     copy_names:
-                       copy_name.kind_of?(String) ? [copy_name] : copy_name,
-                     links_distribution_policy: links_distribution_policy,
-                     conserve_components: conserve_components,
-                     origin_tag: origin_tag)
   end
 
   def set_default_count_tag(tag)
