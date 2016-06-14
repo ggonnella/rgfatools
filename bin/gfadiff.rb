@@ -139,8 +139,8 @@ def diff_segments_or_paths(gfa1,gfa2,rt,out_script,out_identical)
     s1 = gfa1.send(rt,sn)
     s2 = gfa2.send(rt,sn)
     s1.required_fieldnames.each do |fn|
-      v1 = s1.get_field(s1.fieldnames.index(fn), false)
-      v2 = s2.get_field(s2.fieldnames.index(fn), false)
+      v1 = s1.send(fn, false)
+      v2 = s2.send(fn, false)
       if v1 != v2
         difffound = true
         if out_script
