@@ -299,7 +299,7 @@ module GFATools::Edit
       links_of([sn, end_type]).each do |l|
         l_sig = l.other_end([sn, end_type]).join
         to_save = links_signatures[i..i+diff].to_a
-        delete_link_line(l) unless to_save.include?(l_sig)
+        delete_link(l) unless to_save.include?(l_sig)
       end
     end
   end
