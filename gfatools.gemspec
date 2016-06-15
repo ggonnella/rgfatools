@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'gfatools'
-  s.version = '1.0'
+  s.version = '1.0.1'
   s.date = '2016-06-02'
   s.summary = 'Traverse, edit and simplify GFA-format graphs in Ruby'
   s.description = <<-EOF
