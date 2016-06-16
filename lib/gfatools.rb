@@ -4,12 +4,15 @@ require "gfa"
 require_relative "./gfatools/edit.rb"
 require_relative "./gfatools/traverse.rb"
 
+#
+# Module defining additional methods for the GFA class.
+# In the main file is only the method redefinition infrastructure
+# (private methods). The public methods are in the included modules.
+#
 module GFATools
 
   include GFATools::Edit
   include GFATools::Traverse
-
-  ProgramName = "RGFATools"
 
   private
 
@@ -33,10 +36,13 @@ module GFATools
     end
   end
 
+  ProgramName = "RGFATools"
+
   def add_program_name_to_header
     set_header_field(:pn, GFATools::ProgramName)
   end
 
 end
 
+# The main class of RGFA. See the RGFA API documentation.
 class GFA; include GFATools; end
