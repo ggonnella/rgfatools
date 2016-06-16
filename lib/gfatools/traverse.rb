@@ -6,7 +6,64 @@ module GFATools::Traverse
 
   require "set"
 
-  # Remove all p-bubbles in the graph
+  # @!method merge_linear_path(segpath, **options)
+  #   Merge a linear path, i.e. a path of segments without extra-branches.
+  #   @!macro [new] merge_more
+  #     Extends the RGFA method, with additional functionality:
+  #     - +name+: the name of the merged segment is set to the name of the
+  #       single segments joined by underscore (+_+). If a name already
+  #       contained an underscore, it is splitted before merging. Whenever a
+  #       segment is reversed complemented, its name (or the name of all its
+  #       components) is suffixed with a +^+; if the last letter was already
+  #       +^+, it is removed; if it contained +_+ the name is splitted, the
+  #       elements reversed and joined back using +_+; round parentheses are
+  #       removed from the name before processing and added back after it.
+  #     - +:or+: keeps track of the origin of the merged segment; the
+  #       origin tag is set to an array of :or or name
+  #       (if no :or available) tags of the segment which have been merged;
+  #       the character +^+ is assigned the same meaning as in +name+
+  #     - +:rn+: tag used to store possible inversion positions and
+  #       it is updated by this method; i.e. it is passed from the single
+  #       segments to the merged segment, and the coordinates updated
+  #     - +:mp+: tag used to store the position of the
+  #       single segments in the merged segment; it is created or updated by
+  #       this method
+  #   @!macro merge_more
+  #
+  #   @!macro [new] merge_lim
+  #
+  #     Limitations: all containments und paths involving merged segments are
+  #     deleted.
+  #   @!macro merge_lim
+  #
+  #   @param segpath [Array<GFA::SegmentEnd>] a linear path, such as that
+  #     retrieved by #linear_path (see RGFA API documentation)
+  #   @!macro [new] merge_options
+  #     @param options [Hash] optional keyword arguments
+  #     @option options [String, :short, nil] :merged_name (nil)
+  #       if nil, the merged_name is automatically computed; if :short,
+  #       a name is computed starting with "merged1" and calling next until
+  #       an available name is founf; if String, the name to use
+  #     @option options [Boolean] :cut_counts (false)
+  #       if true, total count in merged segment m, composed of segments
+  #       s of set S is multiplied by the factor Sum(|s in S|)/|m|
+  #     @option options [Boolean] :disable_tracking (false)
+  #       if true, the original #multiply of RGFA without RGFATools is called.
+  #   @!macro merge_options
+  #
+  #   @return [GFA] self
+  #   @see #merge_linear_paths
+
+  # @!method merge_linear_paths(**options)
+  #   Merge all linear paths in the graph, i.e.
+  #   paths of segments without extra-branches
+  #   @!macro merge_more
+  #   @!macro merge_lim
+  #   @!macro merge_options
+  #
+  #   @return [GFA] self
+
+  # Removes all p-bubbles in the graph
   # @return [GFA] self
   def remove_p_bubbles
     visited = Set.new
@@ -26,7 +83,7 @@ module GFATools::Traverse
     return self
   end
 
-  # Remove a p-bubble between segment_end1 and segment_end2
+  # Removes a p-bubble between segment_end1 and segment_end2
   # @param [GFA::SegmentEnd] segment_end1 a segment end
   # @param [GFA::SegmentEnd] segment_end2 another segment end
   # @!macro [new] count_tag

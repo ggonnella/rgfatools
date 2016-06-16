@@ -8,13 +8,10 @@ module GFATools::Edit
 
   # @!method multiply_without_gfatools(segment, factor, copy_names: :lowcase, conserve_components: true)
   # Original multiply method of RGFA.
+  # @return [GFA] self
   # See the RGFA API documentation for detail.
 
-  # @!method multiply(segment, factor, copy_names: :lowcase,
-  #   links_distribution_policy: :auto, conserve_components: true,
-  #   origin_tag: :or)
-  # Multiply a segment. Alias of {#multiply_with_gfatools}.
-
+  # @overload multiply(segment, factor, copy_names: :lowcase, links_distribution_policy: :auto, conserve_components: true, origin_tag: :or)
   # Create multiple copies of a segment.
   #
   # Complements the multiply method of gfatools with additional functionality.
@@ -70,7 +67,8 @@ module GFATools::Edit
   #     If factor == 0 (i.e. deletion), delete segment only if
   #     #cut_segment?(segment) is +false+ (see RGFA API).
   # @!macro [new] ldp_param
-  #   @param links_distribution_policy [GFA::Edit::LINKS_DISTRIBUTION_POLICY]
+  #   @param links_distribution_policy
+  #     [GFATools::Edit::LINKS_DISTRIBUTION_POLICY]
   #     <i>(Defaults to: +:auto+)</i>
   #     Determines if and for which end of the segment, links are distributed
   #     among the copies. See "Links distribution policy".
@@ -110,9 +108,10 @@ module GFATools::Edit
   # length) to use for coverage computation
   # <i>(defaults to: 1)</i>.
   #
+  # @param unit_length [Integer] the unit length to use
   # @return [GFA] self
-  def set_count_unit_length(n)
-    @default[:unit_length] = n
+  def set_count_unit_length(unit_length)
+    @default[:unit_length] = unit_length
     return self
   end
 
@@ -144,7 +143,7 @@ module GFATools::Edit
 
   # Remove connected components whose sum of lengths of the segments
   # is under a specified value.
-  # @param minlen [Integer] the minimal length
+  # @param minlen [Integer] the minimum length
   # @return [GFA] self
   def remove_small_components(minlen)
     rm(connected_components.select {|cc|
@@ -153,7 +152,7 @@ module GFATools::Edit
   end
 
   # Remove dead end segments, whose sequence length is under a specified value.
-  # @param minlen [Integer] the minimal length
+  # @param minlen [Integer] the minimum length
   # @return [GFA] self
   def remove_dead_ends(minlen)
     rm(segments.select {|s|
@@ -262,7 +261,7 @@ module GFATools::Edit
   # @!macro segment_param
   # @!macro [new] conserve_components_links
   #   @param [Boolean] conserve_components <i>(Defaults to: +true+)</i>
-  #     delete links only if #cut_link?(segment) is +false+ (see RGFA API).
+  #     delete links only if #cut_link?(link) is +false+ (see RGFA API).
   def enforce_segment_mandatory_links(segment, conserve_components: true)
     segment_name = segment.kind_of?(GFA::Line) ? segment.name : segment
     s = segment!(segment_name)
@@ -291,7 +290,7 @@ module GFATools::Edit
 
   # Remove superfluous links in the presence of mandatory links
   # in the entire graph
-  # @macro [new] conserve_components_links
+  # @!macro conserve_components_links
   # @return [GFA] self
   def enforce_all_mandatory_links(conserve_components: true)
     segment_names.each {|sn| enforce_segment_mandatory_links(sn,
