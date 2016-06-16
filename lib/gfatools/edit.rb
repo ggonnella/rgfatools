@@ -1,3 +1,6 @@
+#
+# Methods which edit the graph components without traversal
+#
 module GFATools::Edit
 
   # Allowed values for the links_distribution_policy option

@@ -4,10 +4,10 @@
 #
 module GFATools::Traverse
 
-  Redefined = [:add_segment_to_merged]
-
   require "set"
 
+  # Remove all p-bubbles in the graph
+  # @return [GFA] self
   def remove_p_bubbles
     visited = Set.new
     segment_names.each do |sn|
@@ -23,8 +23,22 @@ module GFATools::Traverse
         end
       end
     end
+    return self
   end
 
+  # Remove a p-bubble between segment_end1 and segment_end2
+  # @param [GFA::SegmentEnd] segment_end1 a segment end
+  # @param [GFA::SegmentEnd] segment_end2 another segment end
+  # @!macro [new] count_tag
+  #   @param count_tag [Symbol] <i>(defaults to: +:RC+ or the value set by
+  #     {#set_default_count_tag})</i> the count tag to use for coverage
+  #     computation
+  # @!macro [new] unit_length
+  #   @param unit_length [Integer] <i>(defaults to: 1 or the value set by
+  #     {#set_count_unit_length})</i> the unit length to use for coverage
+  #     computation
+  # @return [GFA] self
+  #
   def remove_p_bubble(segment_end1, segment_end2,
                       count_tag: @default[:count_tag],
                       unit_length: @default[:unit_length])
@@ -35,9 +49,12 @@ module GFATools::Traverse
     remove_proven_p_bubble(segment_end1, segment_end2, n1,
                            count_tag: count_tag,
                            unit_length: unit_length)
+    return self
   end
 
   private
+
+  Redefined = [:add_segment_to_merged]
 
   def remove_proven_p_bubble(segment_end1, segment_end2, alternatives,
                              count_tag: @default[:count_tag],
