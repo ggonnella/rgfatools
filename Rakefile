@@ -9,17 +9,17 @@ task :default => :test
 
 desc "Build gem"
 task :build do
-  system("gem build gfatools.gemspec")
+  system("gem build rgfatools.gemspec")
 end
 
 desc "Install gem"
 task :install => :build do
-  system("gem install gfatools")
+  system("gem install rgfatools")
 end
 
 desc "Rm files created by rake build"
 task :clean do
-  system("rm -f gfatools-*.gem")
+  system("rm -f rgfatools-*.gem")
 end
 
 # make documentation generation tasks

@@ -1,8 +1,8 @@
 #
-# Methods for the GFA class, which involve a traversal of the graph following
+# Methods for the RGFA class, which involve a traversal of the graph following
 # links
 #
-module GFATools::Traverse
+module RGFATools::Traverse
 
   require "set"
 
@@ -36,7 +36,7 @@ module GFATools::Traverse
   #     deleted.
   #   @!macro merge_lim
   #
-  #   @param segpath [Array<GFA::SegmentEnd>] a linear path, such as that
+  #   @param segpath [Array<RGFA::SegmentEnd>] a linear path, such as that
   #     retrieved by #linear_path (see RGFA API documentation)
   #   @!macro [new] merge_options
   #     @param options [Hash] optional keyword arguments
@@ -51,7 +51,7 @@ module GFATools::Traverse
   #       if true, the original #multiply of RGFA without RGFATools is called.
   #   @!macro merge_options
   #
-  #   @return [GFA] self
+  #   @return [RGFA] self
   #   @see #merge_linear_paths
 
   # @!method merge_linear_paths(**options)
@@ -61,10 +61,10 @@ module GFATools::Traverse
   #   @!macro merge_lim
   #   @!macro merge_options
   #
-  #   @return [GFA] self
+  #   @return [RGFA] self
 
   # Removes all p-bubbles in the graph
-  # @return [GFA] self
+  # @return [RGFA] self
   def remove_p_bubbles
     visited = Set.new
     segment_names.each do |sn|
@@ -84,8 +84,8 @@ module GFATools::Traverse
   end
 
   # Removes a p-bubble between segment_end1 and segment_end2
-  # @param [GFA::SegmentEnd] segment_end1 a segment end
-  # @param [GFA::SegmentEnd] segment_end2 another segment end
+  # @param [RGFA::SegmentEnd] segment_end1 a segment end
+  # @param [RGFA::SegmentEnd] segment_end2 another segment end
   # @!macro [new] count_tag
   #   @param count_tag [Symbol] <i>(defaults to: +:RC+ or the value set by
   #     {#set_default_count_tag})</i> the count tag to use for coverage
@@ -94,7 +94,7 @@ module GFATools::Traverse
   #   @param unit_length [Integer] <i>(defaults to: 1 or the value set by
   #     {#set_count_unit_length})</i> the unit length to use for coverage
   #     computation
-  # @return [GFA] self
+  # @return [RGFA] self
   #
   def remove_p_bubble(segment_end1, segment_end2,
                       count_tag: @default[:count_tag],
@@ -140,10 +140,10 @@ module GFATools::Traverse
     pos_array.map {|pos| lastpos - pos + 1}.reverse
   end
 
-  def add_segment_to_merged_with_gfatools(merged, segment, reversed, cut, init,
+  def add_segment_to_merged_with_rgfatools(merged, segment, reversed, cut, init,
                                           options)
     if options[:disable_tracking]
-      return add_segment_to_merged_without_gfatools(merged, segment, reversed,
+      return add_segment_to_merged_without_rgfatools(merged, segment, reversed,
                                                     cut, init, options)
     end
     s = (reversed ? segment.sequence.rc[cut..-1] : segment.sequence[cut..-1])

@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
-require "gfatools"
+require "rgfatools"
 
 # crisprs have a structure ARU1RU..RUnRB where |U|~|R| in [24..50]
 
 $debugmode = false
 $spacersonly = false
 
-class GFA
+class RGFA
 
   def find_crisprs(minrepeats=3,minlen=24,maxlen=50)
     ls = {}
@@ -199,7 +199,7 @@ if (ARGV.size == 0)
   STDERR.puts "Usage: #$0 <gfa>"
   exit 1
 end
-gfa = GFA.from_file(ARGV[0])
+gfa = RGFA.from_file(ARGV[0])
 gfa.set_default_count_tag(:KC)
 gfa.set_count_unit_length(gfa.headers_data[:ks]-1)
 gfa.find_crisprs

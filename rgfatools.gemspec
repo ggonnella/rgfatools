@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name = 'gfatools'
+  s.name = 'rgfatools'
   s.version = '1.0.1'
   s.date = '2016-06-02'
   s.summary = 'Traverse, edit and simplify GFA-format graphs in Ruby'
@@ -24,20 +24,20 @@ Gem::Specification.new do |s|
     Furthermore a convention for the naming of the segments is introduced,
     which gives a special meaning to the characters "_^()".
 
-    This gem is depends on the "gfa" gem.
+    This gem depends on the "rgfa" gem.
   EOF
   s.author = 'Giorgio Gonnella'
   s.email = 'gonnella@zbh.uni-hamburg.de'
   s.files = [
-              'lib/gfatools.rb',
-              'lib/gfatools/edit.rb',
-              'lib/gfatools/traverse.rb',
+              'lib/rgfatools.rb',
+              'lib/rgfatools/edit.rb',
+              'lib/rgfatools/traverse.rb',
               'bin/gfadiff.rb',
               'bin/simplify.rb',
               'bin/simulate_debruijn.rb',
               'bin/find_crisprs.rb',
             ]
-  s.homepage = 'http://github.com/ggonnella/ruby-gfa'
+  s.homepage = 'http://github.com/ggonnella/rgfatools'
   s.license = 'CC-BY-SA'
   s.required_ruby_version = '>= 2.0'
 end

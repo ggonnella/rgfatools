@@ -1,21 +1,21 @@
 #
 # Methods which edit the graph components without traversal
 #
-module GFATools::Edit
+module RGFATools::Edit
 
   # Allowed values for the links_distribution_policy option
   LINKS_DISTRIBUTION_POLICY = [:off, :auto, :equal, :E, :B]
 
-  # @!method multiply_without_gfatools(segment, factor, copy_names: :lowcase, conserve_components: true)
+  # @!method multiply_without_rgfatools(segment, factor, copy_names: :lowcase, conserve_components: true)
   # Original multiply method of RGFA.
-  # @return [GFA] self
+  # @return [RGFA] self
   # See the RGFA API documentation for detail.
 
   # @overload multiply(segment, factor, copy_names: :lowcase, links_distribution_policy: :auto, conserve_components: true, origin_tag: :or)
   # Create multiple copies of a segment.
   #
   # Complements the multiply method of gfatools with additional functionality.
-  # To call the original method use {#multiply_without_gfatools}.
+  # To call the original method use {#multiply_without_rgfatools}.
   #
   # @!macro [new] copynames_text
   #
@@ -56,7 +56,7 @@ module GFATools::Edit
   # @param [Integer] factor multiplication factor; if 0, delete the segment;
   #   if 1; do nothing; if > 1; number of copies to create
   # @!macro [new] segment_param
-  #   @param segment [String, GFA::Line::Segment] segment name or instance
+  #   @param segment [String, RGFA::Line::Segment] segment name or instance
   # @param [:lowcase, :upcase, :number, :copy, Array<String>] copy_names
   #   <i>(Defaults to: +:lowcase+)</i>
   #   Array of names for the copies of the segment,
@@ -68,7 +68,7 @@ module GFATools::Edit
   #     #cut_segment?(segment) is +false+ (see RGFA API).
   # @!macro [new] ldp_param
   #   @param links_distribution_policy
-  #     [GFATools::Edit::LINKS_DISTRIBUTION_POLICY]
+  #     [RGFATools::Edit::LINKS_DISTRIBUTION_POLICY]
   #     <i>(Defaults to: +:auto+)</i>
   #     Determines if and for which end of the segment, links are distributed
   #     among the copies. See "Links distribution policy".
@@ -76,17 +76,17 @@ module GFATools::Edit
   #   @param origin_tag [Symbol] <i>(Defaults to: +:or+)</i>
   #     Name of the custom tag to use for storing origin information.
   #
-  # @return [GFA] self
-  def multiply_with_gfatools(segment, factor,
+  # @return [RGFA] self
+  def multiply_with_rgfatools(segment, factor,
                        copy_names: :lowcase,
                        links_distribution_policy: :auto,
                        conserve_components: true,
                        origin_tag: :or)
-    segment_name = segment.kind_of?(GFA::Line) ? segment.name : segment
+    segment_name = segment.kind_of?(RGFA::Line) ? segment.name : segment
     s = segment(segment_name)
     s.send(:"#{origin_tag}=", s.name) if !s.send(origin_tag)
     copy_names = compute_copy_names(copy_names, segment_name, factor)
-    multiply_without_gfatools(segment_name, factor,
+    multiply_without_rgfatools(segment_name, factor,
                                       copy_names: copy_names,
                                       conserve_components: conserve_components)
     distribute_links(links_distribution_policy, segment_name, copy_names,
@@ -97,7 +97,7 @@ module GFATools::Edit
   # Sets the count tag to use as default by coverage computations
   # <i>(defaults to: +:RC+)</i>.
   #
-  # @return [GFA] self
+  # @return [RGFA] self
   # @param tag [Symbol] the tag to use
   def set_default_count_tag(tag)
     @default[:count_tag] = tag
@@ -109,7 +109,7 @@ module GFATools::Edit
   # <i>(defaults to: 1)</i>.
   #
   # @param unit_length [Integer] the unit length to use
-  # @return [GFA] self
+  # @return [RGFA] self
   def set_count_unit_length(unit_length)
     @default[:unit_length] = unit_length
     return self
@@ -127,7 +127,7 @@ module GFATools::Edit
   #     {#set_count_unit_length})</i> the unit length to use for coverage
   #     computation
   #
-  # @return [GFA] self
+  # @return [RGFA] self
   def delete_low_coverage_segments(mincov,
                                    count_tag: @default[:count_tag],
                                    unit_length: @default[:unit_length])
@@ -144,7 +144,7 @@ module GFATools::Edit
   # Remove connected components whose sum of lengths of the segments
   # is under a specified value.
   # @param minlen [Integer] the minimum length
-  # @return [GFA] self
+  # @return [RGFA] self
   def remove_small_components(minlen)
     rm(connected_components.select {|cc|
       cc.map{|sn|segment!(sn).length}.reduce(:+) < minlen })
@@ -153,7 +153,7 @@ module GFATools::Edit
 
   # Remove dead end segments, whose sequence length is under a specified value.
   # @param minlen [Integer] the minimum length
-  # @return [GFA] self
+  # @return [RGFA] self
   def remove_dead_ends(minlen)
     rm(segments.select {|s|
       c = connectivity(s); s.length < minlen and
@@ -168,7 +168,7 @@ module GFATools::Edit
   #   the coverage that shall be considered to be single copy
   # @!macro count_tag
   # @!macro unit_length
-  # @return [GFA] self
+  # @return [RGFA] self
   def compute_copy_numbers(single_copy_coverage,
                            mincov: single_copy_coverage * 0.25,
                            count_tag: @default[:count_tag], tag: :cn,
@@ -194,7 +194,7 @@ module GFATools::Edit
   #   @!macro count_tag
   #   @!macro origin_tag
   #   @!macro conserve_components
-  #   @return [GFA] self
+  #   @return [RGFA] self
   #   @!macro copynames_text
   #   @param [:lowcase, :upcase, :number, :copy] copy_names_suffix
   #     <i>(Defaults to: +:lowcase+)</i>
@@ -205,7 +205,7 @@ module GFATools::Edit
                         links_distribution_policy: :auto,
                         copy_names_suffix: :lowcase, origin_tag: :or,
                         conserve_components: true)
-    segment_name = segment.kind_of?(GFA::Line) ? segment.name : segment
+    segment_name = segment.kind_of?(RGFA::Line) ? segment.name : segment
     s = segment!(segment_name)
     factor = s.send(:"#{count_tag}!")
     multiply(segment_name, factor,
@@ -232,7 +232,7 @@ module GFATools::Edit
   end
 
   # Selects a random orientation for all invertible segments
-  # @return [GFA] self
+  # @return [RGFA] self
   def randomly_orient_invertibles
     segment_names.each do |sn|
       if segment_same_links_both_ends?(sn)
@@ -243,10 +243,10 @@ module GFATools::Edit
   end
 
   # Selects a random orientation for an invertible segment
-  # @return [GFA] self
+  # @return [RGFA] self
   # @!macro segment_param
   def randomly_orient_invertible(segment)
-    segment_name = segment.kind_of?(GFA::Line) ? segment.name : segment
+    segment_name = segment.kind_of?(RGFA::Line) ? segment.name : segment
     if !segment_same_links_both_ends?(segment_name)
       raise "Only segments with links to the same or equivalent segments "+
               "at both ends can be randomly oriented"
@@ -257,13 +257,13 @@ module GFATools::Edit
 
   # Remove superfluous links in the presence of mandatory links
   # for a single segment
-  # @return [GFA] self
+  # @return [RGFA] self
   # @!macro segment_param
   # @!macro [new] conserve_components_links
   #   @param [Boolean] conserve_components <i>(Defaults to: +true+)</i>
   #     delete links only if #cut_link?(link) is +false+ (see RGFA API).
   def enforce_segment_mandatory_links(segment, conserve_components: true)
-    segment_name = segment.kind_of?(GFA::Line) ? segment.name : segment
+    segment_name = segment.kind_of?(RGFA::Line) ? segment.name : segment
     s = segment!(segment_name)
     se = {}
     l = {}
@@ -291,7 +291,7 @@ module GFATools::Edit
   # Remove superfluous links in the presence of mandatory links
   # in the entire graph
   # @!macro conserve_components_links
-  # @return [GFA] self
+  # @return [RGFA] self
   def enforce_all_mandatory_links(conserve_components: true)
     segment_names.each {|sn| enforce_segment_mandatory_links(sn,
                                conserve_components: conserve_components)}
@@ -300,15 +300,15 @@ module GFATools::Edit
 
   # Remove links of segment to itself
   # @!macro segment_param
-  # @return [GFA] self
+  # @return [RGFA] self
   def remove_self_link(segment)
-    segment_name = segment.kind_of?(GFA::Line) ? segment.name : segment
+    segment_name = segment.kind_of?(RGFA::Line) ? segment.name : segment
     unconnect_segments(segment_name, segment_name)
     self
   end
 
   # Remove all links of segments to themselves
-  # @return [GFA] self
+  # @return [RGFA] self
   def remove_self_links
     segment_names.each {|sn| remove_self_link(sn)}
     self
@@ -412,7 +412,7 @@ module GFATools::Edit
   end
 
   def select_distribute_end(links_distribution_policy, segment_name, factor)
-    accepted = GFATools::Edit::LINKS_DISTRIBUTION_POLICY
+    accepted = RGFATools::Edit::LINKS_DISTRIBUTION_POLICY
     if !accepted.include?(links_distribution_policy)
       raise "Unknown links_distribution_policy, accepted values are: "+
         accepted.inspect

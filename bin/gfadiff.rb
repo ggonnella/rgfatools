@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require "gfa"
+require "rgfa"
 
 rt = []
 all_rt = %W[-h -s -l -c -p]
@@ -15,8 +15,8 @@ out_identical = ARGV.delete("-i")
 out_script = ARGV.delete("-script")
 
 if ARGV.size != 2
-  STDERR.puts "Compare two GFA files"
-  STDERR.puts 
+  STDERR.puts "Compare two RGFA files"
+  STDERR.puts
   STDERR.puts "Usage: #$0 [-h] [-s] [-l] [-c] [-p] [-i] [-script] <gfa1> <gfa2>"
   STDERR.puts
   STDERR.puts "If a combination of -h,-s,-l,-c and/or -p is specified, then"
@@ -42,16 +42,16 @@ if out_script
   puts "# gfa2: #{ARGV[1]}"
   puts "#"
   puts
-  puts "require \"gfa\""
+  puts "require \"rgfa\""
   puts
-  puts "gfa = GFA.from_file(\"#{ARGV[0]}\")"
+  puts "gfa = RGFA.from_file(\"#{ARGV[0]}\")"
   puts
 end
 
-gfa1 = GFA.new
+gfa1 = RGFA.new
 gfa1.turn_off_validations
 gfa1.read_file(ARGV[0], validate: false)
-gfa2 = GFA.new
+gfa2 = RGFA.new
 gfa2.turn_off_validations
 gfa2.read_file(ARGV[1], validate: false)
 

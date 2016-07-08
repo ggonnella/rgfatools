@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-require "gfatools"
+require "rgfatools"
 require "set"
 
 def read_sequences(filename, logger)
@@ -28,7 +28,7 @@ end
 
 k = Integer(ARGV[0])
 
-logger = GFA::Logger.new()
+logger = RGFA::Logger.new()
 logger.enable_progress(part: 0.1)
 sequences = read_sequences(ARGV[1], logger)
 logger.log("Sequence lengths (nt): #{sequences.map(&:size)}")
