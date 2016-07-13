@@ -123,7 +123,7 @@ module RGFATools::Traverse
   end
 
   def reverse_segment_name(name, separator)
-    name.split(separator).map do |part|
+    name.to_s.split(separator).map do |part|
       openp = part[0] == "("
       part = part[1..-1] if openp
       closep = part[-1] == ")"
@@ -147,7 +147,7 @@ module RGFATools::Traverse
                                                     cut, init, options)
     end
     s = (reversed ? segment.sequence.rc[cut..-1] : segment.sequence[cut..-1])
-    n = (reversed ? reverse_segment_name(segment.name, "_") : segment.name)
+    n = (reversed ? reverse_segment_name(segment.name, "_") : segment.name.to_s)
     rn = (reversed ? reverse_pos_array(segment.rn, segment.LN) : segment.rn)
     mp = (reversed ? reverse_pos_array(segment.mp, segment.LN) : segment.mp)
     mp = [1, segment.LN] if mp.nil? and segment.LN
@@ -166,7 +166,7 @@ module RGFATools::Traverse
     else
       (segment.sequence == "*") ? (merged.sequence = "*")
                                 : (merged.sequence += s)
-      merged.name += "_#{n}" if options[:merged_name].nil?
+      merged.name = "#{merged.name}_#{n}" if options[:merged_name].nil?
       if merged.LN
         if rn
           rn = rn.map {|pos| pos - cut + merged.LN}

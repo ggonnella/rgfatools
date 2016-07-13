@@ -1,5 +1,7 @@
 require "rake/testtask"
 
+$rgfatoolsversion = 1.1
+
 Rake::TestTask.new do |t|
   t.libs << 'test'
 end
@@ -41,5 +43,5 @@ task :pdf do
                      "toc "+
                      "pdfdoc/index.html "+
                      "--user-style-sheet pdfdoc/print.css "+
-                     "pdfdoc/rgfatools-api-1.0.1.pdf")
+                     "pdfdoc/rgfatools-api-#$rgfatoolsversion.pdf")
 end

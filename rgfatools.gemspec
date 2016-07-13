@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = 'rgfatools'
-  s.version = '1.0.1'
-  s.date = '2016-06-02'
+  s.version = '1.1'
+  s.date = '2016-07-13'
   s.summary = 'Traverse, edit and simplify GFA-format graphs in Ruby'
   s.description = <<-EOF
     The Graphical Fragment Assembly (GFA) is a proposed format which allow

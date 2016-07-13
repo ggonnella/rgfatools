@@ -36,7 +36,7 @@ module RGFATools
     end
   end
 
-  ProgramName = "RRGFATools"
+  ProgramName = "RGFATools"
 
   def add_program_name_to_header
     set_header_field(:pn, RGFATools::ProgramName)

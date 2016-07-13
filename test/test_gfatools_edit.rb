@@ -7,12 +7,12 @@ class TestRGFAToolsEdit < Test::Unit::TestCase
     gfa = ["S\t0\t*\tRC:i:600\tLN:i:100",
            "S\t1\t*\tRC:i:6000\tLN:i:100",
            "S\t2\t*\tRC:i:60000\tLN:i:100"].to_rgfa
-    assert_equal(["0","1","2"], gfa.segment_names)
+    assert_equal([:"0",:"1",:"2"], gfa.segment_names)
     gfa.delete_low_coverage_segments(10)
-    assert_equal(["1","2"], gfa.segment_names)
+    assert_equal([:"1",:"2"], gfa.segment_names)
     assert_nothing_raised { gfa.send(:validate_connect) }
     gfa.delete_low_coverage_segments(100)
-    assert_equal(["2"], gfa.segment_names)
+    assert_equal([:"2"], gfa.segment_names)
     assert_nothing_raised { gfa.send(:validate_connect) }
     gfa.delete_low_coverage_segments(1000)
     assert_equal([], gfa.segment_names)
@@ -36,10 +36,10 @@ class TestRGFAToolsEdit < Test::Unit::TestCase
            "S\t1\t*\tRC:i:1000\tLN:i:100",
            "S\t2\t*\tRC:i:2000\tLN:i:100",
            "S\t3\t*\tRC:i:3000\tLN:i:100"].to_rgfa
-    assert_equal(["0","1","2","3"], gfa.segment_names)
+    assert_equal([:"0",:"1",:"2",:"3"], gfa.segment_names)
     gfa.compute_copy_numbers(9)
     gfa.apply_copy_numbers
-    assert_equal(["1","2","3","2b","3b","3c"], gfa.segment_names)
+    assert_equal([:"1",:"2",:"3",:"2b",:"3b",:"3c"], gfa.segment_names)
     gfa.compute_copy_numbers(9)
     assert(gfa.segments.map(&:cn).all?{|cn|cn == 1})
     assert_nothing_raised { gfa.send(:validate_connect) }
@@ -71,7 +71,7 @@ class TestRGFAToolsEdit < Test::Unit::TestCase
     gfa = RGFA.new
     (s + l).each {|line| gfa << line }
     gfa.merge_linear_paths
-    assert_equal(["0_1_2^_3"], gfa.segment_names)
+    assert_equal([:"0_1_2^_3"], gfa.segment_names)
     l = ["L\t0\t+\t1\t+\t1M",
          "L\t0\t+\t2\t+\t1M",
          "L\t1\t+\t2\t-\t1M",
@@ -79,7 +79,7 @@ class TestRGFAToolsEdit < Test::Unit::TestCase
     gfa = RGFA.new
     (s + l).each {|line| gfa << line }
     gfa.merge_linear_paths
-    assert_equal(["0","3","1_2^"], gfa.segments.map(&:name))
+    assert_equal([:"0",:"3",:"1_2^"], gfa.segments.map(&:name))
   end
 
 end

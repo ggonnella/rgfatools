@@ -82,15 +82,13 @@ module RGFATools::Edit
                        links_distribution_policy: :auto,
                        conserve_components: true,
                        origin_tag: :or)
-    segment_name = segment.kind_of?(RGFA::Line) ? segment.name : segment
-    s = segment(segment_name)
-    s.send(:"#{origin_tag}=", s.name) if !s.send(origin_tag)
-    copy_names = compute_copy_names(copy_names, segment_name, factor)
-    multiply_without_rgfatools(segment_name, factor,
-                                      copy_names: copy_names,
-                                      conserve_components: conserve_components)
-    distribute_links(links_distribution_policy, segment_name, copy_names,
-                     factor)
+    s, sn = segment_and_segment_name(segment)
+    s.set(origin_tag, sn) if !s.get(origin_tag)
+    copy_names = compute_copy_names(copy_names, sn, factor)
+    multiply_without_rgfatools(sn, factor,
+                               copy_names: copy_names,
+                               conserve_components: conserve_components)
+    distribute_links(links_distribution_policy, sn, copy_names, factor)
     return self
   end
 
@@ -116,7 +114,7 @@ module RGFATools::Edit
   end
 
   # Delete segments which have a coverage under a specified value.
-  # 
+  #
   # @param mincov [Integer] the minimum coverage
   # @!macro [new] count_tag
   #   @param count_tag [Symbol] <i>(defaults to: +:RC+ or the value set by
@@ -166,12 +164,15 @@ module RGFATools::Edit
   #   the minimum coverage, cn for segments under this value is set to 0
   # @param single_copy_coverage [Integer]
   #   the coverage that shall be considered to be single copy
+  # @param cn_tag [Symbol] <i>(defaults to: +:cn+)</i>
+  #   the tag to use for storing the copy number
   # @!macro count_tag
   # @!macro unit_length
   # @return [RGFA] self
   def compute_copy_numbers(single_copy_coverage,
                            mincov: single_copy_coverage * 0.25,
-                           count_tag: @default[:count_tag], tag: :cn,
+                           count_tag: @default[:count_tag],
+                           cn_tag: :cn,
                            unit_length: @default[:unit_length])
     segments.each do |s|
       cov = s.coverage!(count_tag: count_tag, unit_length: unit_length).to_f
@@ -182,7 +183,7 @@ module RGFATools::Edit
       else
         cn = (cov / single_copy_coverage).round
       end
-      s.send(:"#{tag}=", cn)
+      s.set(cn_tag, cn)
     end
     self
   end
@@ -205,10 +206,9 @@ module RGFATools::Edit
                         links_distribution_policy: :auto,
                         copy_names_suffix: :lowcase, origin_tag: :or,
                         conserve_components: true)
-    segment_name = segment.kind_of?(RGFA::Line) ? segment.name : segment
-    s = segment!(segment_name)
-    factor = s.send(:"#{count_tag}!")
-    multiply(segment_name, factor,
+    s, sn = segment_and_segment_name(segment)
+    factor = s.get!(count_tag)
+    multiply(sn, factor,
              links_distribution_policy: links_distribution_policy,
              copy_names: copy_names_suffix,
              conserve_components: conserve_components,
@@ -221,8 +221,8 @@ module RGFATools::Edit
   def apply_copy_numbers(count_tag: :cn, links_distribution_policy: :auto,
                          copy_names_suffix: :lowcase, origin_tag: :or,
                          conserve_components: true)
-    segments.sort_by{|s|s.send(:"#{count_tag}!")}.each do |s|
-      multiply(s.name, s.send(count_tag),
+    segments.sort_by{|s|s.get!(count_tag)}.each do |s|
+      multiply(s.name, s.get(count_tag),
                links_distribution_policy: links_distribution_policy,
                copy_names: copy_names_suffix,
                conserve_components: conserve_components,
@@ -263,12 +263,11 @@ module RGFATools::Edit
   #   @param [Boolean] conserve_components <i>(Defaults to: +true+)</i>
   #     delete links only if #cut_link?(link) is +false+ (see RGFA API).
   def enforce_segment_mandatory_links(segment, conserve_components: true)
-    segment_name = segment.kind_of?(RGFA::Line) ? segment.name : segment
-    s = segment!(segment_name)
+    s, sn = segment_and_segment_name(segment)
     se = {}
     l = {}
     [:B, :E].each do |et|
-      se[et] = [s.name, et]
+      se[et] = [sn, et]
       l[et] = links_of(se[et])
     end
     cs = connectivity_symbols(l[:B].size, l[:E].size)
@@ -386,7 +385,7 @@ module RGFATools::Edit
 
   def annotate_random_orientation(segment_name)
     segment = segment!(segment_name)
-    n = segment.name.split("_")
+    n = segment.name.to_s.split("_")
     pairs = 0
     pos = [1, segment.LN]
     if segment.or
@@ -461,6 +460,17 @@ module RGFATools::Edit
         delete_link(l) unless to_save.include?(l_sig)
       end
     end
+  end
+
+  def segment_and_segment_name(segment_or_segment_name)
+    if segment_or_segment_name.kind_of?(RGFA::Line)
+      s = segment_or_segment_name
+      sn = segment_or_segment_name.name
+    else
+      sn = segment_or_segment_name.to_sym
+      s = segment(sn)
+    end
+    return s, sn
   end
 
 end
