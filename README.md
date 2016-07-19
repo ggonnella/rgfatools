@@ -30,7 +30,7 @@ The API documentation is available as pdf under
 https://github.com/ggonnella/rgfatools/blob/master/pdfdoc/rgfatools-api-1.1.pdf
 or in HTML format (http://www.rubydoc.info/github/ggonnella/rgfatools/master/RGFA).
 
-# References
+## References
 
 Giorgio Gonnella, Stefan Kurtz, "RGFA: powerful and convenient handling of
 assembly graphs" (2016)
