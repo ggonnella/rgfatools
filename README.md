@@ -27,10 +27,10 @@ This gem is depends on the "rgfa" gem. Please install the rgfa gem
 first (https://github.com/ggonnella/rgfa).
 
 The API documentation is available as pdf under
-https://github.com/ggonnella/rgfatools/blob/master/pdfdoc/rgfa-api-1.1.pdf
+https://github.com/ggonnella/rgfatools/blob/master/pdfdoc/rgfatools-api-1.1.pdf
 or in HTML format (http://www.rubydoc.info/github/ggonnella/rgfatools/master/RGFA).
 
-.References
+# References
 
 Giorgio Gonnella, Stefan Kurtz, "RGFA: powerful and convenient handling of
 assembly graphs" (2016)
