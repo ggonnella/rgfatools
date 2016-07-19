@@ -1,4 +1,6 @@
-The Graphical Fragment Assembly (GFA) is a proposed format which allow
+The Graphical Fragment Assembly (GFA)
+described under https://github.com/pmelsted/GFA-spec/blob/master/GFA-spec.md
+is a proposed format which allows
 to describe the product of sequence assembly and is implemented in the
 GFA class defined in the gfa gem. This gem represents an extension of the
 GFA class.
@@ -21,4 +23,19 @@ of some segments by the program.
 Furthermore a convention for the naming of the segments is introduced,
 which gives a special meaning to the characters "_^()".
 
-This gem is depends on the "gfa" gem.
+This gem is depends on the "rgfa" gem. Please install the rgfa gem
+first (https://github.com/ggonnella/rgfa).
+
+The API documentation is available as pdf under
+https://github.com/ggonnella/rgfatools/blob/master/pdfdoc/rgfa-api-1.1.pdf
+or in HTML format (http://www.rubydoc.info/github/ggonnella/rgfatools/master/RGFA).
+
+.References
+
+Giorgio Gonnella, Stefan Kurtz, "RGFA: powerful and convenient handling of
+assembly graphs" (2016)
+
+The manuscript describing the library has been accepted for presentation at
+the German Conference on Bioinformatics 2016. The PeerJ preprint will be linked
+here, as soon as available.
+
