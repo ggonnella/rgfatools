@@ -45,3 +45,15 @@ task :pdf do
                      "--user-style-sheet pdfdoc/print.css "+
                      "pdfdoc/rgfatools-api-#$rgfatoolsversion.pdf")
 end
+
+task :enable_assertions do
+  Dir.glob("lib/**/*.rb").each do |filename|
+    system('sed "s/\(\s*\)# <assert> \(.*\)/\1raise \"Assertion failed\" unless \2/" -i '+filename)
+  end
+end
+
+task :disable_assertions do
+  Dir.glob("lib/**/*.rb").each do |filename|
+    system('sed "s/\(\s*\)raise \"Assertion failed\" unless \(.*\)/\1# <assert> \2/" -i '+filename)
+  end
+end
