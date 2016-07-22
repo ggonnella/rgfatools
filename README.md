@@ -2,16 +2,17 @@ The Graphical Fragment Assembly (GFA)
 described under https://github.com/pmelsted/GFA-spec/blob/master/GFA-spec.md
 is a proposed format which allows
 to describe the product of sequence assembly and is implemented in the
-GFA class defined in the gfa gem. This gem represents an extension of the
-GFA class.
+RGFA class defined in the rgfa gem.
 
-Methods in this gem allow, e.g., to randomly orient a segment which has
+RGFATools is an extension to the RGFA library, which allow to perform
+further operations. Thereby additional conventions are required, with respect
+to the GFA specification, which are compatible with it.
+
+The methods defined here allow, e.g., to randomly orient a segment which has
 the same connections on both sides, to compute copy numbers and multiply
 or delete segments according to them, to distribute the links of copies
 after multipling a segment, or to eliminate edges in the graph which
 are incompatible with an hamiltonian path.
-Thereby additional conventions are required, with respect to the GFA
-specification, which are compatible with it.
 
 Custom optional fields
 are defined, such as "cn" for the copy number of a segment,
