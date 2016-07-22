@@ -1,8 +1,9 @@
 RGFATools = Module.new
 
 require "rgfa"
-require_relative "./rgfatools/edit.rb"
-require_relative "./rgfatools/traverse.rb"
+require_relative "rgfatools/error"
+require_relative "rgfatools/edit"
+require_relative "rgfatools/traverse"
 
 #
 # Module defining additional methods for the RGFA class.
@@ -16,21 +17,28 @@ module RGFATools
 
   private
 
-  def self.included(mod)
-    included_modules.each do |im|
-      self.redefine_methods(eval("#{im}::Redefined"), mod)
+  def self.included(klass)
+    included_modules.each do |included_module|
+      if included_module.const_defined?("Redefined")
+        self.redefine_methods(included_module::Redefined, klass)
+      end
+      if included_module.const_defined?("ClassMethods")
+        klass.extend(included_module::ClassMethods)
+      end
     end
   end
 
-  def self.redefine_methods(extended_methods, mod)
-    mod.class_eval do
-      extended_methods.each do |em|
-        was_private = mod.private_instance_methods.include?(em)
-        public em
-        alias_method :"#{em}_without_rgfatools", em
-        alias_method em, :"#{em}_with_rgfatools"
+  def self.redefine_methods(redefined_methods, klass)
+    klass.class_eval do
+      redefined_methods.each do |redefined_method|
+        was_private = klass.private_instance_methods.include?(redefined_method)
+        public redefined_method
+        alias_method :"#{redefined_method}_without_rgfatools", redefined_method
+        alias_method redefined_method, :"#{redefined_method}_with_rgfatools"
         if was_private
-          private em, :"#{em}_without_rgfatools", :"#{em}_with_rgfatools"
+          private redefined_method,
+                  :"#{redefined_method}_without_rgfatools",
+                  :"#{redefined_method}_with_rgfatools"
         end
       end
     end
@@ -44,5 +52,5 @@ module RGFATools
 
 end
 
-# The main class of RRGFA. See the RRGFA API documentation.
+# The main class of RGFA. See the RGFA API documentation.
 class RGFA; include RGFATools; end
