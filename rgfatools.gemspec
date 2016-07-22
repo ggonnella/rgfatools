@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.description = <<-EOF
     The Graphical Fragment Assembly (GFA) is a proposed format which allow
     to describe the product of sequence assembly and is implemented in the
-    GFA class defined in the gfa gem. This gem represents an extension of the
-    GFA class.
+    RGFA class defined in the rgfa gem. This gem represents an extension of the
+    RGFA class.
     Methods in this gem allow, e.g., to randomly orient a segment which has
     the same connections on both sides, to compute copy numbers and multiply
     or delete segments according to them, to distribute the links of copies
