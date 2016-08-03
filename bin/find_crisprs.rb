@@ -14,7 +14,7 @@ class RGFA
     segment_names.each do |sn|
       s = segment(sn)
       s.cn = (s.coverage(unit_length: @default[:unit_length],
-                        count_tag: @default[:count_tag])/2).round
+                         count_tag: @default[:count_tag])/2).round
     end
     output_segment_infos if $debugmode
     maxvisits_global = {:B => {}, :E => {}}
@@ -30,10 +30,17 @@ class RGFA
         maxvisits[rt][sn.to_sym] ||= s.cn
         circles[rt] = []
         linear[rt] = []
-        links_of([sn, rt]).each do |l|
-          search_circle(other_segment_end([sn,rt]),[sn,rt],l,maxvisits[rt],0,
+        segment_end = [sn, rt].to_segment_end
+        links_of(segment_end).each do |l|
+          search_circle(segment_end.revert_end_type,
+                        segment_end,
+                        l,
+                        maxvisits[rt],0,
                         minlen,
-                        maxlen*2+s.length,[[sn,rt]],circles[rt],linear[rt])
+                        maxlen*2+s.length,
+                        [segment_end],
+                        circles[rt],
+                        linear[rt])
         end
         if maxvisits[rt][sn.to_sym] > 0
           multi = {:l => [], :c => []}
@@ -136,7 +143,7 @@ class RGFA
     end
   end
 
-  def merge_crisprs_path(segpath,repeat,repeat_end)
+  def merge_crisprs_path(segpath, repeat, repeat_end)
     merged = create_merged_segment(segpath, merged_name: :short,
                                  disable_tracking: true)[0]
     sequence = merged.sequence[repeat.
@@ -145,7 +152,8 @@ class RGFA
     return sequence
   end
 
-  def search_circle(goal,from,l,maxvisits,dist,mindist,maxdist,path,circles,linear)
+  def search_circle(goal, from, l, maxvisits, dist, mindist,
+                    maxdist, path, circles, linear)
     dest_end = l.other_end(from)
     dest = segment(dest_end[0])
     destsym = dest.name.to_sym
@@ -201,6 +209,6 @@ if (ARGV.size == 0)
 end
 gfa = RGFA.from_file(ARGV[0])
 gfa.set_default_count_tag(:KC)
-gfa.set_count_unit_length(gfa.headers_data[:ks]-1)
+gfa.set_count_unit_length(gfa.get_header_field!(:ks)-1)
 gfa.find_crisprs
 
