@@ -5,6 +5,7 @@ require_relative "rgfatools/error"
 require_relative "rgfatools/edit"
 require_relative "rgfatools/invertible_segments"
 require_relative "rgfatools/multiplication"
+require_relative "rgfatools/superfluous_links"
 require_relative "rgfatools/traverse"
 
 #
@@ -17,6 +18,7 @@ module RGFATools
   include RGFATools::Edit
   include RGFATools::InvertibleSegments
   include RGFATools::Multiplication
+  include RGFATools::SuperfluousLinks
   include RGFATools::Traverse
 
   private
