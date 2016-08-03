@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
               'lib/rgfatools/edit.rb',
               'lib/rgfatools/error.rb',
               'lib/rgfatools/invertible_segments.rb',
+              'lib/rgfatools/multiplication.rb',
               'lib/rgfatools/traverse.rb',
               'bin/gfadiff.rb',
               'bin/simplify.rb',
