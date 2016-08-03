@@ -1,7 +1,7 @@
 #
 # Methods which edit the graph components without traversal
 #
-module RGFATools::Edit
+module RGFATools::CopyNumber
 
   # Sets the count tag to use as default by coverage computations
   # <i>(defaults to: +:RC+)</i>.
@@ -47,27 +47,6 @@ module RGFATools::Edit
     end.compact.each do |sn|
       delete_segment(sn)
     end
-    self
-  end
-
-  # Remove connected components whose sum of lengths of the segments
-  # is under a specified value.
-  # @param minlen [Integer] the minimum length
-  # @return [RGFA] self
-  def remove_small_components(minlen)
-    rm(connected_components.select {|cc|
-      cc.map{|sn|segment!(sn).length}.reduce(:+) < minlen })
-    self
-  end
-
-  # Remove dead end segments, whose sequence length is under a specified value.
-  # @param minlen [Integer] the minimum length
-  # @return [RGFA] self
-  def remove_dead_ends(minlen)
-    rm(segments.select {|s|
-      c = connectivity(s); s.length < minlen and
-        c[0] == 0 or c[1] == 0 and
-        !cut_segment?(s) })
     self
   end
 

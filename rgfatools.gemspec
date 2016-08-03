@@ -30,7 +30,8 @@ Gem::Specification.new do |s|
   s.email = 'gonnella@zbh.uni-hamburg.de'
   s.files = [
               'lib/rgfatools.rb',
-              'lib/rgfatools/edit.rb',
+              'lib/rgfatools/artifacts.rb',
+              'lib/rgfatools/copy_number.rb',
               'lib/rgfatools/error.rb',
               'lib/rgfatools/invertible_segments.rb',
               'lib/rgfatools/multiplication.rb',
