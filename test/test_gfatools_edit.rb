@@ -10,13 +10,10 @@ class TestRGFAToolsEdit < Test::Unit::TestCase
     assert_equal([:"0",:"1",:"2"], gfa.segment_names)
     gfa.delete_low_coverage_segments(10)
     assert_equal([:"1",:"2"], gfa.segment_names)
-    assert_nothing_raised { gfa.send(:validate_connect) }
     gfa.delete_low_coverage_segments(100)
     assert_equal([:"2"], gfa.segment_names)
-    assert_nothing_raised { gfa.send(:validate_connect) }
     gfa.delete_low_coverage_segments(1000)
     assert_equal([], gfa.segment_names)
-    assert_nothing_raised { gfa.send(:validate_connect) }
   end
 
   def test_compute_copy_numbers
@@ -42,7 +39,6 @@ class TestRGFAToolsEdit < Test::Unit::TestCase
     assert_equal([:"1",:"2",:"3",:"2b",:"3b",:"3c"], gfa.segment_names)
     gfa.compute_copy_numbers(9)
     assert(gfa.segments.map(&:cn).all?{|cn|cn == 1})
-    assert_nothing_raised { gfa.send(:validate_connect) }
   end
 
   def test_linear_path_merging
