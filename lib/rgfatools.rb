@@ -3,6 +3,7 @@ RGFATools = Module.new
 require "rgfa"
 require_relative "rgfatools/error"
 require_relative "rgfatools/edit"
+require_relative "rgfatools/invertible_segments"
 require_relative "rgfatools/traverse"
 
 #
@@ -13,6 +14,7 @@ require_relative "rgfatools/traverse"
 module RGFATools
 
   include RGFATools::Edit
+  include RGFATools::InvertibleSegments
   include RGFATools::Traverse
 
   private
