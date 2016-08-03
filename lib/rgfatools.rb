@@ -7,7 +7,8 @@ require_relative "rgfatools/error"
 require_relative "rgfatools/invertible_segments"
 require_relative "rgfatools/multiplication"
 require_relative "rgfatools/superfluous_links"
-require_relative "rgfatools/traverse"
+require_relative "rgfatools/linear_paths"
+require_relative "rgfatools/p_bubbles"
 
 #
 # Module defining additional methods for the RGFA class.
@@ -21,7 +22,8 @@ module RGFATools
   include RGFATools::InvertibleSegments
   include RGFATools::Multiplication
   include RGFATools::SuperfluousLinks
-  include RGFATools::Traverse
+  include RGFATools::LinearPaths
+  include RGFATools::PBubbles
 
   private
 
