@@ -93,13 +93,13 @@ module RGFATools::CopyNumber
   #     the original segment. See "Automatic computation of the copy names".
   # @!macro segment_param
   def apply_copy_number(segment, count_tag: :cn,
-                        links_distribution_policy: :auto,
+                        distribute: :auto,
                         copy_names_suffix: :lowcase, origin_tag: :or,
                         conserve_components: true)
     s, sn = segment_and_segment_name(segment)
     factor = s.get!(count_tag)
     multiply(sn, factor,
-             links_distribution_policy: links_distribution_policy,
+             distribute: distribute,
              copy_names: copy_names_suffix,
              conserve_components: conserve_components,
              origin_tag: origin_tag)
@@ -108,12 +108,12 @@ module RGFATools::CopyNumber
 
   # Applies the computed copy number to all segments
   # @!macro apply_copy_number
-  def apply_copy_numbers(count_tag: :cn, links_distribution_policy: :auto,
+  def apply_copy_numbers(count_tag: :cn, distribute: :auto,
                          copy_names_suffix: :lowcase, origin_tag: :or,
                          conserve_components: true)
     segments.sort_by{|s|s.get!(count_tag)}.each do |s|
       multiply(s.name, s.get(count_tag),
-               links_distribution_policy: links_distribution_policy,
+               distribute: distribute,
                copy_names: copy_names_suffix,
                conserve_components: conserve_components,
                origin_tag: origin_tag)

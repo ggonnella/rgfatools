@@ -11,7 +11,7 @@ module RGFATools::Multiplication
   # @return [RGFA] self
   # See the RGFA API documentation for detail.
 
-  # @overload multiply(segment, factor, copy_names: :lowcase, links_distribution_policy: :auto, conserve_components: true, origin_tag: :or)
+  # @overload multiply(segment, factor, copy_names: :lowcase, distribute: :auto, conserve_components: true, origin_tag: :or)
   # Create multiple copies of a segment.
   #
   # Complements the multiply method of gfatools with additional functionality.
@@ -42,7 +42,7 @@ module RGFATools::Multiplication
   #
   #   <b>Links distribution policy</b>
   #
-  #   Depending on the value of the option +links_ditribution_policy+, an end
+  #   Depending on the value of the option +distribute+, an end
   #   is eventually selected for distribution of the links.
   #
   #   - +:off+: no distribution performed
@@ -67,7 +67,7 @@ module RGFATools::Multiplication
   #     If factor == 0 (i.e. deletion), delete segment only if
   #     #cut_segment?(segment) is +false+ (see RGFA API).
   # @!macro [new] ldp_param
-  #   @param links_distribution_policy
+  #   @param distribute
   #     [RGFATools::Multiplication::LINKS_DISTRIBUTION_POLICY]
   #     <i>(Defaults to: +:auto+)</i>
   #     Determines if and for which end of the segment, links are distributed
@@ -79,7 +79,7 @@ module RGFATools::Multiplication
   # @return [RGFA] self
   def multiply_with_rgfatools(segment, factor,
                        copy_names: :lowcase,
-                       links_distribution_policy: :auto,
+                       distribute: :auto,
                        conserve_components: true,
                        origin_tag: :or)
     s, sn = segment_and_segment_name(segment)
@@ -88,7 +88,7 @@ module RGFATools::Multiplication
     multiply_without_rgfatools(sn, factor,
                                copy_names: copy_names,
                                conserve_components: conserve_components)
-    distribute_links(links_distribution_policy, sn, copy_names, factor)
+    distribute_links(distribute, sn, copy_names, factor)
     return self
   end
 
@@ -99,7 +99,8 @@ module RGFATools::Multiplication
   def select_distribute_end(links_distribution_policy, segment_name, factor)
     accepted = RGFATools::Multiplication::LINKS_DISTRIBUTION_POLICY
     if !accepted.include?(links_distribution_policy)
-      raise "Unknown links_distribution_policy, accepted values are: "+
+      raise "Unknown links distribution policy #{links_distribution_policy}, "+
+        "accepted values are: "+
         accepted.inspect
     end
     return nil if links_distribution_policy == :off
@@ -108,11 +109,17 @@ module RGFATools::Multiplication
     end
     esize = links_of([segment_name, :E]).size
     bsize = links_of([segment_name, :B]).size
+    auto_select_distribute_end(factor, bsize, esize,
+                               links_distribution_policy == :equal)
+  end
+
+  # (keep separate for testing)
+  def auto_select_distribute_end(factor, bsize, esize, equal_only)
     if esize == factor
       return :E
     elsif bsize == factor
       return :B
-    elsif links_distribution_policy == :equal
+    elsif equal_only
       return nil
     elsif esize < 2
       return (bsize < 2) ? nil : :B
