@@ -11,7 +11,7 @@ module RGFATools::SuperfluousLinks
   #   @param [Boolean] conserve_components <i>(Defaults to: +true+)</i>
   #     delete links only if #cut_link?(link) is +false+ (see RGFA API).
   def enforce_segment_mandatory_links(segment, conserve_components: true)
-    s, sn = segment_and_segment_name(segment)
+    sn = segment_and_segment_name(segment)[1]
     se = {}
     l = {}
     [:B, :E].each do |et|
