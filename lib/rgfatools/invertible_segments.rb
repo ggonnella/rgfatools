@@ -60,7 +60,7 @@ module RGFATools::InvertibleSegments
   def segment_signature(segment_end)
     s = segment!(segment_end[0])
     link_targets_for_cmp(segment_end).join(",")+"\t"+
-    link_targets_for_cmp(other_segment_end(segment_end)).join(",")+"\t"+
+    link_targets_for_cmp(segment_end.invert_end_type).join(",")+"\t"+
     [:or].map do |field|
       s.send(field)
     end.join("\t")

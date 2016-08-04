@@ -18,7 +18,7 @@ module RGFATools::PBubbles
         n1 = neighbours(s1).sort
         n2 = neighbours(s2).sort
         n1.each {|se| visited << se[0]}
-        if n1 == n2.map{|se| other_segment_end(se)}
+        if n1 == n2.map{|se| se.invert_end_type}
           remove_proven_p_bubble(s1, s2, n1)
         end
       end
@@ -44,7 +44,7 @@ module RGFATools::PBubbles
                       unit_length: @default[:unit_length])
     n1 = neighbours(segment_end1).sort
     n2 = neighbours(segment_end2).sort
-    raise if n1 != n2.map{|se| other_segment_end(se)}
+    raise if n1 != n2.map{|se| se.invert_end_type}
     raise if n1.any? {|se| connectivity(se[0]) != [1,1]}
     remove_proven_p_bubble(segment_end1, segment_end2, n1,
                            count_tag: count_tag,
