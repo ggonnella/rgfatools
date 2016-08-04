@@ -80,7 +80,7 @@ module RGFATools::InvertibleSegments
     pairs = 0
     pos = [1, segment.LN]
     if segment.or
-      o = segment.or.split(",")
+      o = segment.or.to_s.split(",")
       if o.size > 2
         while o.last == o.first + "^" or o.last + "^" == o.first
           pairs += 1

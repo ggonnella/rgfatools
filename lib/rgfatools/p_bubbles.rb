@@ -17,7 +17,7 @@ module RGFATools::PBubbles
         s2 = neighbours([sn, :E])[0]
         n1 = neighbours(s1).sort
         n2 = neighbours(s2).sort
-        n1.each {|se| visited << se[0]}
+        n1.each {|se| visited << se[0].name}
         if n1 == n2.map{|se| se.invert_end_type}
           remove_proven_p_bubble(s1, s2, n1)
         end
