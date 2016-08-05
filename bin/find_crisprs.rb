@@ -27,12 +27,12 @@ class RGFA
       maxvisits = {}
       [:B, :E].each do |rt|
         maxvisits[rt] = maxvisits_global[rt].dup
-        maxvisits[rt][sn.to_sym] ||= s.cn
+        maxvisits[rt][sn] ||= s.cn
         circles[rt] = []
         linear[rt] = []
-        segment_end = [sn, rt].to_segment_end
+        segment_end = [s, rt].to_segment_end
         links_of(segment_end).each do |l|
-          search_circle(segment_end.revert_end_type,
+          search_circle(segment_end.invert_end_type,
                         segment_end,
                         l,
                         maxvisits[rt],0,
@@ -79,8 +79,8 @@ class RGFA
       end
       merged_circles = []
       circles[:E].each {|c|merged_circles << merge_crisprs_path(c,s,:E)}
-      before = merge_crisprs_path(linear[:B][0],s,:B)
-      after = merge_crisprs_path(linear[:E][0],s,:E)
+      before = merge_crisprs_path(linear[:B].first,s,:B)
+      after = merge_crisprs_path(linear[:E].first,s,:E)
       next if merged_circles.size < minrepeats
       maxvisits_global = maxvisits
       instances = 1
@@ -135,8 +135,8 @@ class RGFA
     segment_names.each do |sn|
       s = segment(sn)
       puts "#{s.name}\t#{s.cn}\t"+
-        "#{neighbours([s.name,:B]).map{|nb|segment(nb[0]).cn}.inject(:+)}\t"+
-        "#{neighbours([s.name,:E]).map{|nb|segment(nb[0]).cn}.inject(:+)}\t"+
+        "#{neighbours([s.name,:B]).map{|nb|segment(nb.segment).cn}.inject(:+)}\t"+
+        "#{neighbours([s.name,:E]).map{|nb|segment(nb.segment).cn}.inject(:+)}\t"+
         "#{links_of([s.name,:B]).size}\t"+
         "#{links_of([s.name,:E]).size}\t"+
         "#{s.KC}\t#{s.length}"
@@ -154,47 +154,40 @@ class RGFA
 
   def search_circle(goal, from, l, maxvisits, dist, mindist,
                     maxdist, path, circles, linear)
-    dest_end = l.other_end(from)
-    dest = segment(dest_end[0])
-    destsym = dest.name.to_sym
-    maxvisits[destsym] ||= dest.cn
-    se = other_segment_end(dest_end)
-    if dest_end == goal
-      if dist < mindist
-        return
-      end
+    dest = l.other_end(from)
+    dest.segment = segment(dest.segment)
+    maxvisits[dest.name] ||= dest.segment.cn
+    se = dest.invert_end_type
+    if dest == goal
+      return if dist < mindist
       new_path = path.dup
       new_path << se
-      new_path[0..-2].each {|x| maxvisits[x[0].to_sym] -= 1}
+      new_path[0..-2].each {|x| maxvisits[x.name] -= 1}
       circles << new_path
       return
     end
-    if maxvisits[destsym] == 0
-      return
-    end
-    if path.any?{|x|x[0]==dest_end[0]}
-      return
-    end
+    return if maxvisits[dest.name] == 0
+    return if path.any?{|x|x.name==dest.name}
     new_path = path.dup
     new_path << se
-    dist += dest.length - l.overlap[0][0]
+    dist += dest.segment.length - l.overlap.first.len
     if dist > maxdist
       new_path = path.dup
       new_path << se
-      new_path[0..-1].each {|x| maxvisits[x[0].to_sym] -= 1}
+      new_path[0..-1].each {|x| maxvisits[x.name] -= 1}
       linear << new_path
       return
     end
     ls = links_of(se)
     if ls.size == 0
-      new_path[0..-1].each {|x| maxvisits[x[0].to_sym] -= 1}
+      new_path[0..-1].each {|x| maxvisits[x.name] -= 1}
       linear << new_path
       return
     end
     ls.each do |next_l|
-      next_dest = segment(next_l.other_end(se)[0])
-      maxvisits[next_dest.name.to_sym] ||= next_dest.cn
-      next if maxvisits[next_dest.name.to_sym] == 0
+      next_dest = segment(next_l.other_end(se).segment)
+      maxvisits[next_dest.name] ||= next_dest.cn
+      next if maxvisits[next_dest.name] == 0
       search_circle(goal,se,next_l,maxvisits,dist,mindist,maxdist,new_path,
                     circles,linear)
     end
@@ -209,6 +202,7 @@ if (ARGV.size == 0)
 end
 gfa = RGFA.from_file(ARGV[0])
 gfa.set_default_count_tag(:KC)
-gfa.set_count_unit_length(gfa.get_header_field!(:ks)-1)
+gfa.header.ks ||= gfa.segments[0].length + 1
+gfa.set_count_unit_length(gfa.header.ks-1)
 gfa.find_crisprs
 
