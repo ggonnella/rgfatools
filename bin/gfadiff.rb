@@ -50,14 +50,14 @@ end
 
 gfa1 = RGFA.new
 gfa1.turn_off_validations
-gfa1.read_file(ARGV[0], validate: false)
+gfa1.read_file(ARGV[0])
 gfa2 = RGFA.new
 gfa2.turn_off_validations
-gfa2.read_file(ARGV[1], validate: false)
+gfa2.read_file(ARGV[1])
 
 if rt.include?("-h")
-  h1 = gfa1.headers_data
-  h2 = gfa2.headers_data
+  h1 = gfa1.header
+  h2 = gfa2.header
   if h1 == h2
     if out_identical
       puts "# Header values are identical"
@@ -70,38 +70,92 @@ if rt.include?("-h")
     if out_script
       puts "# Headers"
       puts
-      puts "hd = gfa.headers_data"
     end
-    (h1.keys - h2.keys).each do |k|
-      v = h1[k].inspect
+    (h1.optional_fieldnames - h2.optional_fieldnames).each do |k|
       if out_script
-        puts "hd.delete(#{k.inspect})"
+        puts "gfa.header.delete_field(#{k.inspect})"
       else
-        puts "<\t[headers/exclusive]\t#{k.inspect}\t#{v}"
-      end
-    end
-    (h2.keys - h1.keys).each do |k|
-      v = h2[k].inspect
-      if out_script
-        puts "hd[#{k.inspect}]=#{v}"
-      else
-        puts ">\t[headers/exclusive]\t#{k.inspect}\t#{v}"
-      end
-    end
-    (h1.keys & h2.keys).each do |k|
-      v1 = h1[k]
-      v2 = h2[k]
-      if v1 != v2
-        if out_script
-          puts "hd[#{k.inspect}]=#{v2.inspect}"
+        v = h1.get(k)
+        if v.kind_of?(RGFA::FieldArray)
+          t = v.datatype
+          v.each do |elem|
+            elem = elem.to_gfa_field(datatype: t)
+            puts "<\t[headers/exclusive/multivalue/#{k}]\t#{elem}"
+          end
         else
-          puts "<\t[headers/valuediff/#{k}]\t#{v1}"
-          puts ">\t[headers/valuediff/#{k}]\t#{v2}"
+          v = h1.field_to_s(k, optfield: true)
+          puts "M\t[headers/exclusive]\t#{k.inspect}\t#{v}"
+        end
+      end
+    end
+    (h2.optional_fieldnames - h1.optional_fieldnames).each do |k|
+      v = h2.get(k)
+      if out_script
+        t = h2.get_datatype(k)
+        puts "gfa.header.set_datatype(#{k.inspect},#{t.inspect})"
+        if v.kind_of?(RGFA::FieldArray)
+          t = v.datatype
+          v.each do |elem|
+            puts "gfa.set_header_field(#{k.inspect},#{elem.inspect}, "+
+            "datatype: #{t.inspect}, existing: :add)"
+          end
+        else
+          puts "gfa.header.#{k}=#{v.inspect}"
+        end
+      else
+        if v.kind_of?(RGFA::FieldArray)
+          t = v.datatype
+          v.each do |elem|
+            elem = elem.to_gfa_field(datatype: t)
+            puts ">\t[headers/exclusive/multivalue/#{k}]\t#{elem}"
+          end
+        else
+          v = h2.field_to_s(k, optfield: true)
+          puts ">\t[headers/exclusive]\t#{k.inspect}\t#{v}"
+        end
+      end
+    end
+    (h1.optional_fieldnames & h2.optional_fieldnames).each do |k|
+      v1 = h1.get(k)
+      v2 = h2.get(k)
+      v1a = v1.kind_of?(RGFA::FieldArray) ? v1.sort : [v1]
+      v2a = v2.kind_of?(RGFA::FieldArray) ? v2.sort : [v2]
+      t1 = v1.kind_of?(RGFA::FieldArray) ? v1.datatype : h1.get_datatype(k)
+      t2 = v2.kind_of?(RGFA::FieldArray) ? v2.datatype : h2.get_datatype(k)
+      m1 = v1.kind_of?(RGFA::FieldArray) ? "multivalue/" : ""
+      m2 = v2.kind_of?(RGFA::FieldArray) ? "multivalue/" : ""
+      if out_script
+        if t1 != t2 or v1a != v2a
+          puts "gfa.header.delete_field(#{k.inspect})"
+          v2a.each do |v2|
+            v2 = v2.to_gfa_field(datatype: t2)
+            puts "gfa.set_header_field(#{k.inspect},#{v2.inspect}, "+
+            "datatype: #{t2.inspect}, existing: :add)"
+          end
+        end
+      else
+        if t1 != t2
+          v1a.each do |v1|
+            v1 = v1.to_gfa_field(datatype: t1)
+            puts "<\t[headers/typediff/#{m1}#{k}#{}]\t#{v1}"
+          end
+          v2a.each do |v2|
+            v2 = v2.to_gfa_field(datatype: t2)
+            puts ">\t[headers/typediff/#{m2}#{k}]\t#{v2}"
+          end
+        else
+          (v1a-v2a).each do |v1|
+            v1 = v1.to_gfa_field(datatype: t1)
+            puts "<\t[headers/valuediff/#{m1}#{k}]\t#{v1}"
+          end
+          (v2a-v1a).each do |v2|
+            v2 = v2.to_gfa_field(datatype: t2)
+            puts ">\t[headers/valuediff/#{m2}#{k}]\t#{v2}"
+          end
         end
       end
     end
     if out_script
-      puts "gfa.set_headers(hd)"
       puts
     end
   end
@@ -139,8 +193,8 @@ def diff_segments_or_paths(gfa1,gfa2,rt,out_script,out_identical)
     s1 = gfa1.send(rt,sn)
     s2 = gfa2.send(rt,sn)
     s1.required_fieldnames.each do |fn|
-      v1 = s1.send(fn, false)
-      v2 = s2.send(fn, false)
+      v1 = s1.field_to_s(fn)
+      v2 = s2.field_to_s(fn)
       if v1 != v2
         difffound = true
         if out_script
@@ -156,28 +210,34 @@ def diff_segments_or_paths(gfa1,gfa2,rt,out_script,out_identical)
     (s1f - s2f).each do |fn|
       difffound = true
       if out_script
-        puts "gfa.#{rt}(#{sn.inspect}).rm_opfield(#{fn.inspect})"
+        puts "gfa.#{rt}(#{sn.inspect}).delete_field(#{fn.inspect})"
       else
-        puts "<\t[#{rts}/optfields/exclusive/#{sn}]\t#{s1.optfield(fn).to_s}"
+        v = s1.field_to_s(fn, optfield: true)
+        puts "<\t[#{rts}/optfields/exclusive/#{sn}]\t#{v}"
       end
     end
     (s2f - s1f).each do |fn|
       difffound = true
-      v = s2.optfield(fn).to_s
       if out_script
-        puts "gfa.#{rt}(#{sn.inspect}) << #{v.inspect}"
+        v = s2.get(fn)
+        t = s2.get_datatype(fn)
+        puts "gfa.#{rt}(#{sn.inspect}).set_datatype(#{fn.inspect},#{t})"
+        puts "gfa.#{rt}(#{sn.inspect}).#{fn}=#{v.inspect}"
       else
+        v = s2.field_to_s(fn, optfield: true)
         puts ">\t[#{rts}/optfields/exclusive/#{sn}]\t#{v}"
       end
     end
     (s1f & s2f).each do |fn|
-      v1 = s1.optfield(fn).to_s
-      v2 = s2.optfield(fn).to_s
+      v1 = s1.field_to_s(fn, optfield: true)
+      v2 = s2.field_to_s(fn, optfield: true)
       if v1 != v2
         difffound = true
         if out_script
-          puts "gfa.#{rt}(#{sn.inspect}).#{fn}="+
-            "#{s2.optfield(fn).value(false).inspect}"
+          v = s2.get(fn)
+          t = s2.get_datatype(fn)
+          puts "gfa.#{rt}(#{sn.inspect}).set_datatype(#{fn.inspect},#{t})"
+          puts "gfa.#{rt}(#{sn.inspect}).#{fn}=#{v.inspect}"
         else
           puts "<\t[#{rts}/optfields/valuediff/#{sn}]\t#{v1}"
           puts ">\t[#{rts}/optfields/valuediff/#{sn}]\t#{v2}"
@@ -214,9 +274,7 @@ if rt.include?("-l")
     [:B, :E].each {|et| difflinks1 += gfa1.links_of([sn, et])}
   end
   difflinks1.uniq.each do |l|
-    if out_script
-      puts "gfa.rm(gfa.link(#{l.from_end.inspect}, #{l.to_end.inspect}))"
-    else
+    if !out_script
       puts "<\t[links/exclusive_segments]\t#{l.to_s}"
     end
   end
@@ -252,7 +310,11 @@ if rt.include?("-l")
   end
   (difflinks1b-difflinks1).uniq.each do |l|
     if out_script
-      puts "gfa.rm(gfa.link(#{l.from_end.inspect}, #{l.to_end.inspect}))"
+      puts "gfa.rm(gfa.link_from_to(#{l.from.to_sym.inspect}, "+
+                                   "#{l.from_orient.inspect}, "+
+                                   "#{l.to.to_sym.inspect}, "+
+                                   "#{l.to_orient.inspect}, "+
+                                   "#{l.overlap.to_s.inspect}.to_cigar))"
     else
       puts "<\t[links/different]\t#{l.to_s}"
     end
@@ -286,9 +348,7 @@ if rt.include?("-c")
     cexcl1 += gfa1.containing(sn)
   end
   cexcl1.uniq.each do |c|
-    if out_script
-      puts "gfa.rm(gfa.containment(#{c.from.inspect}, #{c.to.inspect}))"
-    else
+    if !out_script
       puts "<\t[contaiments/exclusive_segments]\t#{c.to_s}"
     end
   end
@@ -325,7 +385,9 @@ if rt.include?("-c")
   end
   (cdiff1-cexcl1).uniq.each do |l|
     if out_script
-      puts "gfa.rm(gfa.containment(#{l.from.inspect}, #{l.to.inspect}))"
+      # TODO: handle multiple containments for a segments pair
+      puts "gfa.rm(gfa.containment(#{l.from.to_sym.inspect}, "+
+                                  "#{l.to.to_sym.inspect}))"
     else
       puts "<\t[containments/different]\t#{l.to_s}"
     end
