@@ -92,12 +92,12 @@ if rt.include?("-h")
       v = h2.get(k)
       if out_script
         t = h2.get_datatype(k)
-        puts "gfa.header.set_datatype(#{k.inspect},#{t.inspect})"
+        puts "gfa.header.set_datatype(#{k.inspect}, #{t.inspect})"
         if v.kind_of?(RGFA::FieldArray)
           t = v.datatype
           v.each do |elem|
-            puts "gfa.set_header_field(#{k.inspect},#{elem.inspect}, "+
-            "datatype: #{t.inspect}, existing: :add)"
+            puts "gfa.header.add(#{k.inspect}, #{elem.inspect}, "+
+                 "#{t.inspect})"
           end
         else
           puts "gfa.header.#{k}=#{v.inspect}"
@@ -126,11 +126,11 @@ if rt.include?("-h")
       m2 = v2.kind_of?(RGFA::FieldArray) ? "multivalue/" : ""
       if out_script
         if t1 != t2 or v1a != v2a
-          puts "gfa.header.delete_field(#{k.inspect})"
+          puts "gfa.header.delete(#{k.inspect})"
           v2a.each do |v2|
             v2 = v2.to_gfa_field(datatype: t2)
-            puts "gfa.set_header_field(#{k.inspect},#{v2.inspect}, "+
-            "datatype: #{t2.inspect}, existing: :add)"
+            puts "gfa.header.add(#{k.inspect}, #{v2.inspect}, "+
+                 "#{t2.inspect})"
           end
         end
       else
