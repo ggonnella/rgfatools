@@ -1,7 +1,0 @@
-*.gem
-Gemfile.lock
-Gemfile
-pdfdoc/index.html
-pdfdoc/rgfatools-api-*.pdf
-.yardoc
-doc
